@@ -1,0 +1,111 @@
+* {
+  box-sizing: border-box;
+}
+
+.auth-panel {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background: url(/login-bg.png) center center no-repeat;
+  background-size: cover;
+  display: -webkit-box;
+  -webkit-box-align: center;
+  -webkit-box-pack: center;
+}
+
+.auth-panel .auth-form {
+  width: 558px;
+  /* height: 506px; */
+  border-radius: 5px;
+  /* padding: 0px 30px 58px 30px; */
+  position: relative;
+}
+
+.auth-panel .auth-form .logo {
+  width: 100%;
+  height: 80px;
+  position: absolute;
+  top: -40px;
+  background: url(/logo.png) center center no-repeat;
+  background-size: 80px 80px;
+  z-index: 1;
+}
+
+.auth-panel .auth-form .text {
+  position: absolute;
+  width: 100%;
+  height: 120px;
+  line-height: 130px;
+  font-size: 28px;
+  color: #1c233f;
+  text-align: center;
+  background: url(/key.png) center center no-repeat #fff;
+  background-size: 70px 70px;
+  background-position: 90% center;
+  border-radius: 5px 5px 0 0;
+}
+
+.auth-panel .auth-form .form {
+  width: 100%;
+  height: auto;
+  padding: 20px 30px 58px 30px;
+  margin-top: 118px;
+  background: url(/logo-form-bg.jpg) center center no-repeat;
+  background-size: cover;
+  border-radius: 0 0 5px 5px;
+}
+
+.auth-panel .auth-form .form .ant-form-item-required {
+  font-size: 16px;
+}
+
+.auth-panel .auth-form .form .ant-form-item-required::before {
+  content: '';
+}
+
+.auth-panel .auth-form .form .login input {
+  height: 48px;
+  font-size: 16px;
+  color: #8b9097;
+}
+
+.auth-panel .auth-form .form .login-button {
+  margin-top: 60px;
+  margin-bottom: 0;
+}
+
+.auth-panel .auth-form .form .login-button button {
+  width: 100%;
+  height: 49px;
+  font-size: 20px;
+}
+
+.auth-panel .auth-form .form .register-button button {
+  width: 100%;
+  height: 38px;
+  font-size: 16px;
+}
+
+.auth-panel .auth-form .form .ant-form-item-with-help {
+  margin-bottom: 0px;
+}
+
+.auth-panel .auth-form .form .ant-form-item {
+  width: 100%;
+}
+
+.auth-panel .auth-form .form .register-form label {
+  font-size: 14px;
+}
+
+.auth-panel .auth-form .form .register-form .ant-form-item {
+  height: 69px;
+}
+
+.col-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  width: 300px;
+}

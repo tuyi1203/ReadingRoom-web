@@ -1,0 +1,24 @@
+import React from 'react';
+
+/**
+ * UI组件最好是界面组件，内部不能有业务逻辑，通过props传入的moduleAction改变moduleState来实现业务逻辑
+ */
+class {{name}} extends React.Component {
+  render() {
+
+    /**
+     * 组件通过this.props.shareState.moduleState获取父级页面共享的数据
+     */
+
+    /**
+     * 组件通过this.props.shareState.moduleAction获取父级页面共享的方法
+     */
+    return (
+      <div>
+        这是{{name}}组件
+      </div>
+    )
+  }
+}
+
+export default {{name}};

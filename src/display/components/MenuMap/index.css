@@ -1,0 +1,27 @@
+.menu-map .ant-drawer-content {
+  background-color: #001529 !important;
+  /* padding-top: 35px !important; */
+}
+
+.menu-map .ant-drawer-header {
+  background-color: rgba(9, 15, 40, 0.9) !important;
+  border-bottom: none;
+  border-radius: 0;
+}
+
+.menu-map .ant-drawer-header .ant-drawer-title {
+  color: #fff !important;
+  font-size: 18px !important;
+}
+
+.menu-map .ant-drawer-close {
+  color: #fff !important;
+}
+
+.ant-menu-item-group-title {
+  color: #939393 !important;
+}
+
+.ant-menu-item {
+  color: #f8f8f8 !important;
+}

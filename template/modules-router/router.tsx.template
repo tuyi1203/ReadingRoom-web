@@ -1,0 +1,9 @@
+import React from 'react';
+import { Route } from 'react-router-dom';
+import XXX from './XXX';
+
+const routers = [
+  <Route key="/xxx" path="*/xxx" component={XXX} />,
+];
+
+export default routers;

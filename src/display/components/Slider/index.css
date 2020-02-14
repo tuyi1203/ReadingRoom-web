@@ -1,0 +1,51 @@
+.layout-sider .sider {
+  /* min-height: 750px; */
+  border-right: 1px solid rgb(232, 232, 232);
+  /* background-color: rgb(250, 250, 250); */
+  /* background-color: #4f5569; */
+}
+
+.layout-sider .ant-layout-sider-children {
+  background: #4f5569;
+}
+
+.layout-sider .sider .ant-menu-inline {
+  width: 200px !important;
+  border-right: none !important;
+  background: #4f5569 !important;
+}
+
+.layout-sider .logo {
+  width: 200px;
+  height: 69px;
+  line-height: 69px;
+  font-size: 18px;
+  text-align: center;
+  font-family: PingFangSC-Semibold, PingFang SC;
+  font-weight: 600;
+  color: #fff;
+  padding: 0 20px;
+  overflow: hidden;
+  position: relative;
+  border-bottom: 1px solid #2240a0;
+  background-color: #2240a0;
+}
+
+.layout-sider .logo .show-all {
+  position: absolute;
+  left: 10px;
+  top: 18px;
+}
+
+.layout-sider .module-name {
+  color: #fff;
+  font-size: 20px;
+  width: 100%;
+  height: 45px;
+  line-height: 45px;
+  text-align: center;
+}
+
+.ant-menu.ant-menu-dark .ant-menu-item-selected, .ant-menu-submenu-popup.ant-menu-dark .ant-menu-item-selected {
+  background-color: #365ddb !important;
+}

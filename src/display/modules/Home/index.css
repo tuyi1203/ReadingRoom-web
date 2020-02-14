@@ -1,0 +1,118 @@
+.ant-layout {
+  background: #fff;
+}
+
+.layout-content {
+  /* padding: 0px 21px 24px 21px; */
+  /* padding: 24px; */
+  background-color: #eaf0f7;
+  min-height: 700px;
+  /* border-top: 1px solid rgba(233, 233, 233, 1); */
+  /* box-shadow: 0px 0px 5px 3px #d6d6d6; */
+}
+
+.layout-content>div {
+  width: 100%;
+  height: 100%;
+  display: -webkit-box;
+  display: -moz-box;
+  -webkit-box-align: start;
+  -moz-box-align: start;
+  -webkit-box-pack: start;
+  -moz-box-pack: start;
+  /* autoprefixer: off */
+  -webkit-box-orient: vertical;
+}
+
+.layout-content .content {
+  width: 100%;
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  padding: 0px 21px 24px 21px;
+  display: -webkit-box;
+  display: -moz-box;
+  -webkit-box-align: start;
+  -moz-box-align: start;
+  -webkit-box-pack: start;
+  -moz-box-pack: start;
+  /* autoprefixer: off */
+  -webkit-box-orient: vertical;
+}
+
+.layout-content .content .filter-content {
+  height: auto;
+  padding-bottom: 20px;
+}
+
+.filter-form .ant-form-item {
+  width: 24%;
+}
+
+.filter-form .ant-form-item button {
+  margin-right: 20px;
+}
+
+.layout-content .content .page-content {
+  width: 100%;
+  background-color: #fff;
+  min-height: 700px;
+  padding: 24px 21px;
+  border-radius: 5px;
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.ant-layout-footer {
+  height: 40px;
+  line-height: 40px;
+  padding: 0;
+  text-align: center;
+  font-size: 12px;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(102, 102, 102, 1);
+}
+
+.layout-breadcrumb {
+  height: 69px;
+  width: 100%;
+  /* border-bottom: 1px solid rgba(233, 233, 233, 1); */
+  background-color: #eaf0f7;
+}
+
+.layout-breadcrumb .page-name {
+  width: auto;
+  height: 100%;
+  line-height: 69px;
+  color: #5363a6;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 0 25px;
+  float: left;
+}
+
+.layout-breadcrumb .page-button {
+  width: auto;
+  height: 100%;
+  padding-top: 18px;
+  float: left;
+}
+
+.layout-breadcrumb .page-button button {
+  margin-right: 20px;
+}
+
+.layout-breadcrumb .page-button .filter-select {
+  min-width: 250px;
+}
+
+.modal-form .ant-form-item {
+  width: 100% !important;
+  margin-bottom: 5px;
+}
+
+.tree-card .ant-card-head-title {
+  height: 64px !important;
+}

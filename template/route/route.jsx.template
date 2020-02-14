@@ -1,0 +1,16 @@
+import React from 'react';
+import { Route } from 'react-router-dom';
+import Test from './Test'; // 这里引入组件
+
+/**
+ * 路由配置
+ * 注意，2级路由需要在path之前加上*，否则无法解析路由
+ */
+const getRouters = (props) => {
+  const routers = [
+    <Route key="/test" path="*/test" component={Test} {...props} />,// 这里为组件定义路由
+  ]
+  return routers;
+}
+
+export default getRouters;
