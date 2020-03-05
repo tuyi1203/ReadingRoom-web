@@ -1,5 +1,11 @@
 enum Urls {
   login = '/login', // 登录api地址
+  qrLogin = '/qrlogin', // 微信扫码登陆
+  getVerifyCode = '/getverifycode', // 取得短信验证码
+  bindLogin = '/bindlogin', // 微信绑定登陆
+
+  getLoginQRCode = '/wechat/getloginqrcode', // 取得微信登陆二维码
+
   basicLogin = '/login/basic', // 基础登录地址
   getRoleListUnLogin = '/login/roles', // 不需要token读取角色列表
   register = '/login/register', // 注册

@@ -41,7 +41,7 @@ class MyHeader extends React.PureComponent<IProps, IState> {
   }
 
   UNSAFE_componentWillMount() {
-    this.getShortcutMenu();
+    // this.getShortcutMenu();
   }
 
   /**
@@ -72,6 +72,7 @@ class MyHeader extends React.PureComponent<IProps, IState> {
     const logOut = () => {
       // 清空登录信息
       storageUtils.remove(Constant.LOGIN_KEY);
+      storageUtils.remove(Constant.SENCE_ID);
 
       // 返回登录页
       window.location.href = '/login';
@@ -89,7 +90,7 @@ class MyHeader extends React.PureComponent<IProps, IState> {
     /**
      * 删除快捷菜单
      */
-    const delMenu = async (id: string) => {
+    const delMenu = async (id: number) => {
       // message.info('暂无法删除，等待后端接口');
       const res = await system.delShortcutMenu(id);
       if (res.code) {
@@ -120,7 +121,7 @@ class MyHeader extends React.PureComponent<IProps, IState> {
         }
       }
       const res = await system.saveShortcutMenu({
-        index: [parseInt(currentPage.id, 10)]
+        index: [currentPage.id]
       });
       if (res.code) {
         message.success('保存快捷菜单成功');

@@ -6,6 +6,7 @@ import IPages from 'src/dataModel/IPages';
 import storageUtils from 'src/utils/storageUtils';
 import Constant from 'src/dataModel/Constant';
 import './index.css';
+import _ from 'lodash';
 
 const { SubMenu } = Menu;
 
@@ -61,9 +62,9 @@ class Slider extends React.PureComponent<IProps, IState> {
     let selectedKey: string[] = [];
     let openKey: string[] = [];
     if (currentPage) {
-      selectedKey = [currentPage.id];
+      selectedKey = [_.toString(currentPage.id)];
       if (currentPage.pid) {
-        openKey = [currentPage.pid];
+        openKey = [_.toString(currentPage.pid)];
       }
     }
 
@@ -107,7 +108,7 @@ class Slider extends React.PureComponent<IProps, IState> {
     /**
      * 获取子菜单
      */
-    const getSubMenu = (id: string): any => {
+    const getSubMenu = (id: number): any => {
       const list: any = [];
       // 找到当前模块的所有1级菜单
       const subMenus = pages.filter(p => p.pid === id);
@@ -156,11 +157,11 @@ class Slider extends React.PureComponent<IProps, IState> {
     /**
      * 获取顶部菜单
      */
-    const getTopPage = (id: string | null): IPages | null => {
+    const getTopPage = (id: number | null): IPages | null => {
       if (pages && pages.length > 0) {
         const parentPage = pages.filter(p => p.id === id);
         if (parentPage && parentPage.length > 0) {
-          if (parentPage[0].pid === '0') {
+          if (_.isNull(parentPage[0].pid)) {
             return parentPage[0];
           } else {
             return getTopPage(parentPage[0].pid);

@@ -31,7 +31,7 @@ export interface IState {
 /**
  * Permission
  */
-class Permission extends React.PureComponent<IProps, IState> {
+class Role extends React.PureComponent<IProps, IState> {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -482,4 +482,4 @@ class Permission extends React.PureComponent<IProps, IState> {
   }
 }
 
-export default Permission;
+export default Role;

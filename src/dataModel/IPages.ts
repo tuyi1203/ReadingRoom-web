@@ -2,12 +2,12 @@ export default interface IPages {
   /**
    * 页面id
    */
-  id: string;
+  id: number;
 
   /**
    * 上级页面id
    */
-  pid: string | null;
+  pid: number | null;
 
   /**
    * 页面名称

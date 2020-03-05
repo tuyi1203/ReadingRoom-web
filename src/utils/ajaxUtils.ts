@@ -13,6 +13,7 @@ import { message } from 'antd';
 // axios.defaults.baseURL = '';  
 let config: object = {
   timeout: 20 * 1000, // 超时时间
+  // baseURL: 'api/v1/auth',
   // withCredentials: true, // Check cross-site Access-Control
 };
 
@@ -24,15 +25,18 @@ const _axios: AxiosInstance = axios.create(config);
  */
 _axios.interceptors.request.use(
   (config) => {
-    message.loading('数据加载中...', 0);
-    // console.log(config);
-    if (config.url === '/login' || config.url === '/login/basic' || config.url === '/login/register') {
-      const data = config.data;
-      const tmp = data.userName + ':' + data.password;
-      const tmp2 = window.btoa(tmp);
-      // console.log(tmp2);
-      config.headers['Authorization'] = 'Basic ' + tmp2;
+    if (config.url !== '/qrlogin') {
+      message.loading('数据加载中...', 0);
     }
+    
+    // console.log(config);
+    // if (config.url === '/login' || config.url === '/login/basic' || config.url === '/login/register') {
+    //   const data = config.data;
+    //   const tmp = data.userName + ':' + data.password;
+    //   const tmp2 = window.btoa(tmp);
+    //   // console.log(tmp2);
+    //   config.headers['Authorization'] = 'Basic ' + tmp2;
+    // }
     // 发起请求前拦截器，可以在这里添加header等
     // window.$$_web_env.apiDomain
     config.url = window.$$_web_env.apiDomain + config.url;

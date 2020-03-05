@@ -1,5 +1,5 @@
 export default interface IResult<T> {
-  code: boolean;
+  code: number;
   msg: string;
   results: T;
 }

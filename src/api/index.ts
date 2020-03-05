@@ -14,3 +14,4 @@ export { default as IPManage } from './IPManage';
 export { default as linemanager } from './linemanager';
 export { default as contractmanager } from './contractmanager';
 export { default as attaches } from './attaches';
+export { default as wechat } from './wechat';

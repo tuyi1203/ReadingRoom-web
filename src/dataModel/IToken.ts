@@ -13,7 +13,7 @@ export default interface IToken {
   /**
    * token失效时间
    */
-  // tokenExpireDate: Date | null;
+  tokenExpireDate: Date | null;
 
   /**
    * 刷新token

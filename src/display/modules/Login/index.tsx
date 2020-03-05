@@ -1,11 +1,13 @@
 import * as React from 'react';
-import { Form, Input, Icon, Button, message, Select } from 'antd';
-import { system } from 'src/api';
+import { Form, Input, Icon, Button, message, Select, Divider, Modal } from 'antd';
+import { system, wechat } from 'src/api';
 import IToken from 'src/dataModel/IToken';
 import IPages from 'src/dataModel/IPages';
 import storageUtils from 'src/utils/storageUtils';
 import Constant from 'src/dataModel/Constant';
 import AnonymousPages from 'src/config/Menus';
+import QRCodeModal from './qrCodeModal';
+import BindModal from './bindModal';
 import './index.css';
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -22,6 +24,11 @@ export interface IState {
   domainList: any[];
   roleList: any[];
   userName: string | null;
+  showQRCodeModal: boolean;
+  isScanning: boolean;
+  showBindModal: boolean;
+  verifyCodeSending: boolean;
+  countSeconds: number;
 }
 
 class Login extends React.Component<IProps, IState> {
@@ -32,12 +39,19 @@ class Login extends React.Component<IProps, IState> {
       domainList: [], // 组列表
       roleList: [], // 角色列表
       userName: null, // 输入的用户名
+      showQRCodeModal: false, // 显示微信登陆二维码
+      isScanning: false, // 正在扫描二维码
+      showBindModal: false, // 显示微信绑定页面
+      verifyCodeSending: false, // 验证码发送标志
+      countSeconds: 59, // 再次发送倒计时
     };
   }
 
+  timeout: any;
+
   UNSAFE_componentWillMount() {
-    this.getDomainRefer();
-    this.getRoleList();
+    // this.getDomainRefer();
+    // this.getRoleList();
   }
 
   componentDidMount() {
@@ -74,14 +88,14 @@ class Login extends React.Component<IProps, IState> {
   /**
    * 获取角色列表
    */
-  getRoleList = async () => {
-    const res = await system.getRole();
-    if (res.code) {
-      this.setState({
-        roleList: res.results.data
-      });
-    }
-  }
+  // getRoleList = async () => {
+  //   const res = await system.getRole();
+  //   if (res.code) {
+  //     this.setState({
+  //       roleList: res.results.data
+  //     });
+  //   }
+  // }
 
   /**
    * 点击登录
@@ -102,21 +116,22 @@ class Login extends React.Component<IProps, IState> {
           try {
             const loginResult = await system.login(values);
             // console.log(loginResult);
-            if (!loginResult.code) {
-              if (typeof loginResult.results === 'string') {
-                this.setState({
-                  showBind: true,
-                  userName: values.userName
-                });
-                return;
-              }
+            if (loginResult.code !== 0) {
+              // if (!loginResult.code) {
+              // if (typeof loginResult.results === 'string') {
+              //   this.setState({
+              //     showBind: true,
+              //     userName: values.userName
+              //   });
+              //   return;
+              // }
               message.error(loginResult.msg);
               return;
             }
 
             this.loginIn(loginResult, values);
           } catch (e) {
-            // console.log(e);
+            console.log(e);
             // 调用带basic的登录
             try {
               const loginResult = await system.loginBasic(values);
@@ -143,19 +158,66 @@ class Login extends React.Component<IProps, IState> {
   }
 
   /**
+   * 开始扫描登陆二维码
+   */
+  scanCodeStart = () => {
+    this.setState({
+      isScanning: true,
+    }, () => {
+      this.timeout = setInterval(async () => {
+        const loginResult = await wechat.qrLogin({
+          'senceid': storageUtils.get(Constant.SENCE_ID),
+        });
+        // console.log(loginResult);
+        if (loginResult.code !== 0) {
+          // message.error(loginResult.msg);
+          console.log(loginResult.msg);
+          return;
+        }
+        if (loginResult.results.data
+          && loginResult.results.data.needtobind) {
+          // 打开绑定窗口
+          this.setState({
+            showBindModal: true,
+          }, () => {
+            this.scanCodeEnd();
+          });
+        } else {
+          this.scanCodeEnd();
+          this.loginIn(loginResult, null);
+        }
+      }, 1000);
+    });
+  }
+
+  /**
+   * 取消扫描登陆二维码
+   */
+  scanCodeEnd = () => {
+    this.setState({
+      isScanning: false,
+    }, () => {
+      if (this.timeout) {
+        clearInterval(this.timeout);
+      }
+    });
+  }
+
+  /**
    * 处理登录
    */
   loginIn = (loginResult: any, values: any) => {
     // 设置登录返回的菜单权限
+    console.log(loginResult);
     const permissionPages: IPages[] = [];
-    if (loginResult.results.modules && loginResult.results.modules.length > 0) {
-      const pbcMenu = loginResult.results.modules;
+    if (loginResult.results.data.menus && loginResult.results.data.menus.length > 0) {
+      const pbcMenu = loginResult.results.data.menus;
       pbcMenu.forEach((p: any) => {
         permissionPages.push({
-          id: p.index.toString(),
-          pid: p.belong.toString(),
-          name: p.title_cn,
-          url: p.uri,
+          id: p.id,
+          pid: p.parent_id,
+          name: p.name,
+          url: p.url,
           icon: p.icon,
         });
       });
@@ -166,19 +228,31 @@ class Login extends React.Component<IProps, IState> {
 
     // 封装在token中
     const token: IToken = {
-      token: loginResult.results.jwt,
+      token: loginResult.results.data.access_token,
+      tokenExpireDate: loginResult.results.data.expires_at,
       pages: pages,
       loginInfo: {
         avatar: null,
-        name: values.userName
+        name: loginResult.results.data.user.full_name
       }
     };
 
     // // 存入本地缓存中
     storageUtils.set(Constant.LOGIN_KEY, JSON.stringify(token));
+    storageUtils.remove(Constant.SENCE_ID);
 
     // 跳转到dashboard
     this.props.history.push('/usermanager/user');
+    // this.props.history.push('/dashboard');
+  }
+
+  /**
+   * 显示微信登陆二维码
+   */
+  showQRCode = () => {
+    this.setState({
+      showQRCodeModal: true,
+    });
   }
 
   public render() {
@@ -202,8 +276,79 @@ class Login extends React.Component<IProps, IState> {
           list.push(<Option key={p.id} value={p.id}>{p.description}</Option>);
         });
       }
-
       return list;
+    };
+
+    /**
+     * 二维码模态窗取消
+     */
+    const onCancel = () => {
+      this.setState({
+        showQRCodeModal: false,
+      });
+    };
+
+    /**
+     * 绑定登录模态窗取消
+     */
+    const onBindModalCancel = () => {
+      this.setState({
+        showBindModal: false
+      }, () => {
+        onCancel();
+      });
+    };
+
+    /**
+     * 发送验证码
+     */
+    const onSendVerifyCode = () => {
+      this.props.form.validateFields(['mobile'], async (err: boolean, values: any) => {
+        if (!err) {
+          this.setState({ verifyCodeSending: true }, async () => {
+            const res = await wechat.getVerifyCode({ mobile: values.mobile });
+            if (res.code === 0) {
+              storageUtils.set(Constant.VERIFY_KEY, res.results.data.verifykey);
+              let countSeconds = this.state.countSeconds;
+              let timer = setInterval(() => {
+                this.setState({
+                  countSeconds: (countSeconds--),
+                }, () => {
+                  if (countSeconds <= -1) {
+                    clearInterval(timer);
+                    this.setState({
+                      verifyCodeSending: false,
+                      countSeconds: 59
+                    });
+                  }
+                });
+              }, 1000);
+            }
+          });
+        }
+      });
+    };
+
+    /**
+     * 手机绑定模态窗保存
+     */
+    const onBindModalOK = () => {
+      this.props.form.validateFields(/*['loginId'],*/ async (err: boolean, values: any) => {
+        if (!err) {
+          const res = await wechat.bindLogin({
+            mobile: values.mobile,
+            verifycode: values.verifycode,
+            senceid: storageUtils.get(Constant.SENCE_ID),
+            verifykey: storageUtils.get(Constant.VERIFY_KEY),
+          });
+          if (res.code !== 0) {
+            message.error(res.msg);
+            return;
+          }
+          this.scanCodeEnd();
+          this.loginIn(res, null);
+        }
+      });
     };
 
     return (
@@ -212,16 +357,16 @@ class Login extends React.Component<IProps, IState> {
           !showBind &&
           <div className="auth-form">
             <div className="logo" />
-            <div className="text">天枢平台登录</div>
+            <div className="text">人民小学系统登录</div>
             <div className="form">
               <Form>
-                <FormItem label="用户名">
-                  {getFieldDecorator('userName', {
+                <FormItem label="用户邮箱">
+                  {getFieldDecorator('email', {
                     rules: [
-                      { required: true, whitespace: true, message: '请输入用户名' },
+                      { required: true, whitespace: true, message: '请输入邮箱' },
                     ],
                   })(
-                    <Input className="login" suffix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)', fontSize: '16px' }} />} placeholder="请输入用户名" />
+                    <Input className="login" suffix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)', fontSize: '16px' }} />} placeholder="请输入用户邮箱" />
                   )}
                 </FormItem>
                 <FormItem label="密码">
@@ -233,6 +378,10 @@ class Login extends React.Component<IProps, IState> {
                 </FormItem>
                 <FormItem className="login-button">
                   <Button type="primary" className="auth-form-button" onClick={() => this.formSubmit()}>登录</Button>
+                </FormItem>
+                <Divider>第三方账号登录</Divider>
+                <FormItem className="thirdparty-login-button">
+                  <Button type="primary" icon="wechat" className="wechat-login-button" onClick={() => this.showQRCode()} block={true}>微信登录</Button>
                 </FormItem>
               </Form>
             </div>
@@ -320,6 +469,46 @@ class Login extends React.Component<IProps, IState> {
               </Form>
             </div>
           </div>
+        }
+        {
+          this.state.showQRCodeModal &&
+          <Modal
+            title="微信登陆"
+            visible={true}
+            // onOk={onOk}
+            maskClosable={false}
+            onCancel={onCancel}
+            centered={true}
+            destroyOnClose={true}
+            width={400}
+            footer={null}
+          >
+            {<QRCodeModal
+              scanCodeStart={this.scanCodeStart}
+              scanCodeEnd={this.scanCodeEnd}
+            />}
+          </Modal>
+        }
+        {
+          this.state.showBindModal &&
+          <Modal
+            title="手机号码绑定登陆"
+            visible={true}
+            onOk={onBindModalOK}
+            maskClosable={false}
+            onCancel={onBindModalCancel}
+            centered={true}
+            destroyOnClose={true}
+            width={300}
+          >
+            {<BindModal
+              onSendVerifyCode={onSendVerifyCode}
+              verifyCodeSending={this.state.verifyCodeSending}
+              countSeconds={this.state.countSeconds}
+              loading={this.state.verifyCodeSending}
+              form={this.props.form}
+            />}
+          </Modal>
         }
       </div >
     );

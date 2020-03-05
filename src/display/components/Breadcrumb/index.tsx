@@ -43,7 +43,7 @@ class Bread extends React.PureComponent<IProps, IState> {
     /**
      * 递归找上级
      */
-    const getParent = (pid: string | null) => {
+    const getParent = (pid: number | null) => {
       if (pid && pages && pages.length > 0) {
         const parent = pages.filter(p => p.id === pid);
         if (parent && parent.length > 0) {

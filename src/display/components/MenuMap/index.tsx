@@ -6,6 +6,7 @@ import storageUtils from 'src/utils/storageUtils';
 import Constant from 'src/dataModel/Constant';
 import IPages from 'src/dataModel/IPages';
 import './index.css';
+import _ from 'lodash';
 const { SubMenu } = Menu;
 
 /** Props接口，定义需要用到的Porps类型 */
@@ -35,12 +36,16 @@ class MenuMap extends React.PureComponent<IProps, IState> {
     // 找到1级菜单
     const pages: IPages[] = this.state.token ? this.state.token.pages : [];
 
+    console.log(pages);
+
     /**
      * 跳转到
      */
-    const goTo = (url: string) => {
-      this.props.closeMap();
-      this.props.history.push(url);
+    const goTo = (url: string | null) => {
+      if (url) {
+        this.props.closeMap();
+        this.props.history.push(url);
+      }
     };
 
     /**
@@ -61,7 +66,7 @@ class MenuMap extends React.PureComponent<IProps, IState> {
     /**
      * 获取2级菜单
      */
-    const getSubMenu = (pid: string) => {
+    const getSubMenu = (pid: number) => {
       const list: any[] = [];
       const subPages = pages.filter(p => p.pid === pid);
       if (subPages && subPages.length > 0) {
@@ -92,7 +97,7 @@ class MenuMap extends React.PureComponent<IProps, IState> {
      */
     const getFirstMenu = () => {
       const list: any[] = [];
-      const firstPages = pages.filter(p => p.pid === '0');
+      const firstPages = pages.filter(p => _.isNull(p.pid));
       if (firstPages && firstPages.length > 0) {
         firstPages.forEach(o => {
           list.push(

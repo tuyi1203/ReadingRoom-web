@@ -19,10 +19,7 @@ export interface IState {
   page: number;
   pageSize: number;
   total: number;
-  userList: any;
   roleList: any;
-  domainList: any;
-  groupList: any;
   showAdd: boolean;
   editData: any;
   filterItems: string[];
@@ -32,17 +29,14 @@ export interface IState {
 /**
  * User
  */
-class User extends React.PureComponent<IProps, IState> {
+class Role extends React.PureComponent<IProps, IState> {
   constructor(props: any) {
     super(props);
     this.state = {
       page: 1,
       pageSize: 10,
       total: 0, // 总条数
-      userList: [], // 用户列表
       roleList: [], // 角色列表
-      domainList: [], // 获取域列表
-      groupList: [], // 获取组织列表
       showAdd: false, // 是否显示添加
       editData: null, // 编辑数据
       filterItems: [], // 显示的筛选项
@@ -96,25 +90,7 @@ class User extends React.PureComponent<IProps, IState> {
 
     if (res) {
       this.setState({
-        userList: res.results.data,
         total: res.results.count
-      });
-    }
-  }
-
-  /*
-   * 获取域列表
-   */
-  getDomainList = async () => {
-    const res = await usermanager.getDomainList({});
-    // console.log(res);
-    if (!res.code) {
-      return;
-    }
-
-    if (res) {
-      this.setState({
-        domainList: res.results.data,
       });
     }
   }
@@ -135,23 +111,6 @@ class User extends React.PureComponent<IProps, IState> {
       });
     }
   }
-
-  /*
-   * 获取组织列表
-   */
-  getGroupList = async () => {
-    const res = await usermanager.getGroupList({});
-    if (!res.code) {
-      return;
-    }
-
-    if (res) {
-      this.setState({
-        groupList: res.results.data,
-      });
-    }
-  }
-
   /*
    * 有效用户选项
    */
@@ -166,10 +125,7 @@ class User extends React.PureComponent<IProps, IState> {
       total,
       page,
       pageSize,
-      userList,
       roleList,
-      domainList,
-      groupList,
     } = this.state;
 
     const { getFieldDecorator } = this.props.form;
@@ -348,8 +304,6 @@ class User extends React.PureComponent<IProps, IState> {
         if (!err) {
           let res: any = null;
           console.log(values);
-          const domainInfo = _.find(domainList, ['id', values.domain_id]);
-          values.domain_name = (domainInfo && domainInfo.name) || '';
           if (this.state.editData) {
             // 编辑
             values.id = this.state.editData.id; // body中追加userId
@@ -507,7 +461,7 @@ class User extends React.PureComponent<IProps, IState> {
             <Table
               columns={column}
               rowKey="id"
-              dataSource={userList}
+              dataSource={roleList}
               bordered={true}
               pagination={{
                 size: 'small',
@@ -538,8 +492,6 @@ class User extends React.PureComponent<IProps, IState> {
               form={this.props.form}
               editData={this.state.editData}
               roleList={roleList}
-              domainList={domainList}
-              groupList={groupList}
             />}
           </Modal>
         }
@@ -548,4 +500,4 @@ class User extends React.PureComponent<IProps, IState> {
   }
 }
 
-export default Form.create({})(User);
+export default Form.create({})(Role);

@@ -10,7 +10,7 @@ const config = {
   /**
    * api域名
    */
-  apiDomain: 'http://10.1.252.31:8000'
+  apiDomain: 'http://readingroom.natapp1.cc:80/api/v1',
 }
 
 module.exports = config;
