@@ -15,13 +15,19 @@ class CommonUtils {
         myreg = /^[a-z0-9\u4e00-\u9fa5]+$/i;
         break;
       case 'uint': // 验证正整数
-        myreg = /^[1-9]+\d*$/;
+        myreg = /^([1-9]\d*|0)$/;
         break;
       case 'ipwithport': // 校验带端口号的IP地址
         myreg = /^((2[0-4]\d|25[0-5]|[1]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[1]?\d\d?):\d+$/;
         break;
       case 'ip': // 校验带端口号的IP地址
         myreg = /^((2[0-4]\d|25[0-5]|[1]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[1]?\d\d?)$/;
+        break;
+      case 'alphabet': // 校验字母和下划线
+        myreg = /^[a-zA-Z_]+$/;
+        break;
+      case 'kanji': // 校验中文汉字
+        myreg =  /^[\u4e00-\u9fa5]+$/;
         break;
       default:
         myreg = /^$/;

@@ -1,0 +1,19 @@
+::-webkit-scrollbar {display:none}
+
+.ant-checkbox-group {
+    padding-left:20px;
+    padding-top:10px;
+}
+
+.ant-checkbox-group-item {
+    display: block;
+    margin-right: 0;
+    /* margin-left: 20px; */
+    margin-top:10px;
+}
+
+.permission .panel {
+    border: 1px solid #e8e8e8;
+    height: 400px;
+    overflow-y: scroll;
+}

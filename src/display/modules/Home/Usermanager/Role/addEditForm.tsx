@@ -1,10 +1,8 @@
 import * as React from 'react';
-import { 
-  Form, 
-  Input, 
-  Radio, 
-  Switch, 
-  // Select 
+import {
+  Form,
+  Input,
+  InputNumber,
 } from 'antd';
 import CommonUtils from 'src/utils/commonUtils';
 // import { usermanager } from 'src/api';
@@ -16,7 +14,6 @@ const FormItem = Form.Item;
 export interface IProps {
   form: any;
   editData?: any;
-  roleList: any;
 }
 
 /** State接口，定义需要用到的State类型，constructor中的state应该和此定义的类型一致 */
@@ -35,7 +32,7 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
   }
 
   render() {
-    const { editData, roleList } = this.props;
+    const { editData } = this.props;
     const { getFieldDecorator } = this.props.form;
     // console.log(groupList);
     /**
@@ -49,84 +46,92 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
     // };
 
     /**
-     * 校验手机号码
+     * 校验角色代号
      */
-    const validateMobile = (rule: any, value: any, callback: any) => {
-      if (!value || !CommonUtils.regex('mobile', value)) {
-        callback('请输入正确的手机号码！');
+    const validateAlphabet = (rule: any, value: any, callback: any) => {
+      if (!value) {
+        callback();
+      }
+
+      if (!CommonUtils.regex('alphabet', value)) {
+        callback(new Error('角色代号只能由字母和下划线组成'));
       }
       callback();
     };
 
     /**
-     * 获取角色选项
+     * 校验角色中文名称
      */
-    const getRoleOptions = () => {
-      const list: any[] = [];
-      if (roleList && roleList.length > 0) {
-        roleList.forEach((p: any) => {
-          list.push({
-            label: p.description,
-            value: p.id
-          });
-        });
+    const validateKanji = (rule: any, value: any, callback: any) => {
+      if (!value) {
+        callback();
       }
-      return list;
+
+      if (!CommonUtils.regex('kanji', value)) {
+        callback(new Error('角色中文名称只能输入中文字符'));
+      }
+      callback();
     };
+
+    /**
+     * 校验序号
+     */
+    const validateUint = (rule: any, value: any, callback: any) => {
+      if (!value) {
+        callback();
+      }
+      if (!Number.isInteger(parseInt(value, 10))) {
+        // if (!CommonUtils.regex('unit', value)) {
+        callback(new Error('请输入0或者正整数'));
+      }
+      callback();
+    };
+
+    /**
+     * 校验手机号码
+     */
+    // const validateMobile = (rule: any, value: any, callback: any) => {
+    //   if (!value || !CommonUtils.regex('mobile', value)) {
+    //     callback('请输入正确的手机号码！');
+    //   }
+    //   callback();
+    // };
 
     return (
       <Form className="modal-form" layout="inline" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
-        <FormItem label="用户名">
-          {getFieldDecorator('username', {
-            initialValue: editData ? editData.username : null,
+        <FormItem label="角色代号">
+          {getFieldDecorator('name', {
+            initialValue: editData ? editData.name : null,
             rules: [
-              { required: true, message: '请输入用户名' }
-            ],
-          })(
-            <Input disabled={editData ? true : false} />
-          )}
-        </FormItem>
-        <FormItem label="姓名">
-          {getFieldDecorator('alias_name', {
-            initialValue: editData ? editData.alias_name : null,
-            rules: [
-              { required: true, message: '请输入姓名' }
+              { required: true, message: '请输入角色代号' },
+              { validator: validateAlphabet }
             ],
           })(
             <Input />
           )}
         </FormItem>
-        <FormItem label="描述">
-          {getFieldDecorator('description', {
-            initialValue: editData ? editData.description : null,
+        <FormItem label="角色中文名称">
+          {getFieldDecorator('name_zn', {
+            initialValue: editData ? editData.name_zn : null,
             rules: [
-              // { required: true, message: '请输入姓名' }
+              { required: true, message: '请输入角色中文名称' },
+              { validator: validateKanji }
             ],
           })(
             <Input />
           )}
         </FormItem>
-        <FormItem label="邮箱">
-          {getFieldDecorator('email', {
-            initialValue: editData ? editData.email : null,
+        <FormItem label="序号">
+          {getFieldDecorator('order_sort', {
+            initialValue: editData ? editData.order_sort : 0,
             rules: [
-              { required: true, type: 'email', message: '请输入正确的邮箱' }
+              { required: true, message: '请输入数字序号' },
+              { validator: validateUint }
             ],
           })(
-            <Input />
+            <InputNumber />
           )}
         </FormItem>
-        {!editData
-          && <FormItem label="邮件信息">
-            {getFieldDecorator('email_msg', {
-              initialValue: editData ? editData.email_msg : null,
-              rules: [
-                { required: true, message: '请输入邮件信息' }
-              ],
-            })(
-              <Input />
-            )}
-          </FormItem>}
         {/* {editData &&
           <FormItem label="密码">
             {getFieldDecorator('password', {
@@ -139,27 +144,7 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
             )}
           </FormItem>
         } */}
-        <FormItem label="手机">
-          {getFieldDecorator('telephone', {
-            initialValue: editData ? editData.telephone : null,
-            rules: [
-              { validator: validateMobile }
-            ],
-          })(
-            <Input />
-          )}
-        </FormItem>
-        <FormItem label="用户角色">
-          {getFieldDecorator('role', {
-            initialValue: editData ? editData.role : null,
-            rules: [
-              { required: true, message: '请选择用户角色' }
-            ],
-          })(
-            <Radio.Group options={getRoleOptions()} />
-          )}
-        </FormItem>
-        {editData &&
+        {/* {editData &&
           <FormItem label="有效用户">
             {getFieldDecorator('validate', {
               valuePropName: 'checked',
@@ -168,7 +153,7 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
               <Switch checkedChildren="是" unCheckedChildren="否" />
             )}
           </FormItem>
-        }
+        } */}
       </Form>
     );
   }

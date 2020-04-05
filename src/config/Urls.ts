@@ -8,6 +8,16 @@ enum Urls {
 
   basicLogin = '/login/basic', // 基础登录地址
   getRoleListUnLogin = '/login/roles', // 不需要token读取角色列表
+
+    // ----------角色管理接口------------
+  getRoleList = '/roles', // 取得角色列表
+  delRole = '/roles/{id}', // 删除角色
+  addRole = '/roles', // 添加角色
+  editRole = '/roles/{id}', // 修改角色
+  getPermissionList = '/permissions', // 取得所有权限列表
+  getPermissionsByRid = '/permissions/rid/{id}', // 取得角色拥有的所有权限列表
+  editPermissionsByRid = '/permissions/rid/{id}', // 修改角色拥有的所有权限
+
   register = '/login/register', // 注册
   getDomainListUnLogin = '/login/domains',  // 不需要token读取组织列表
   getNetElement = '/infra/datadict/netelement', // 获取网元数据列表

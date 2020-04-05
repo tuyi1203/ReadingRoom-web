@@ -5,6 +5,12 @@ import add from './add';
 import edit from './edit';
 import del from './del';
 import getModules from './getModules';
+import getRoleList from './getRoleList';
+import getPermissionList from './getPermissionList';
+import delRole from './delRole';
+import addRole from './addRole';
+import editRole from './editRole';
+import editRolePermissions from './editRolePermissions';
 export default {
   getList,
   getDomainList,
@@ -12,5 +18,11 @@ export default {
   edit,
   add,
   del,
-  getModules
+  getModules,
+  getRoleList,
+  delRole,
+  addRole,
+  editRole,
+  getPermissionList,
+  editRolePermissions,
 };

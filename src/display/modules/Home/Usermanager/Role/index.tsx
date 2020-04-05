@@ -1,9 +1,10 @@
 import * as React from 'react';
 import moment from 'moment';
 import * as _ from 'lodash';
-import { usermanager, system } from 'src/api';
+import { usermanager } from 'src/api';
 import { Button, Form, message, Table, Divider, Popconfirm, Modal, Select, Input } from 'antd';
 import AddEditModal from './addEditForm';
+import PermissionForm from './permissionForm';
 import CommonButton from 'src/display/components/CommonButton';
 import CurrentPage from 'src/display/components/CurrentPage';
 
@@ -21,6 +22,7 @@ export interface IState {
   total: number;
   roleList: any;
   showAdd: boolean;
+  showPermission: boolean;
   editData: any;
   filterItems: string[];
   filterParam: any;
@@ -41,18 +43,16 @@ class Role extends React.PureComponent<IProps, IState> {
       editData: null, // 编辑数据
       filterItems: [], // 显示的筛选项
       filterParam: {}, // 筛选对象数据
+      showPermission: false, // 显示角色权限数据
     };
   }
 
   UNSAFE_componentWillMount() {
-    // this.getList();
-    // this.getDomainList();
-    // this.getGroupList();
-    // this.getRoleList();
+    this.getList();
   }
 
   /*
-   * 获取用户列表
+   * 获取角色列表
    */
   getList = async () => {
     const param: any = {
@@ -62,55 +62,28 @@ class Role extends React.PureComponent<IProps, IState> {
 
     // 增加筛选条件
     if (this.state.filterParam) {
-      if (this.state.filterParam.s_username) {
-        param.username__icontains = this.state.filterParam.s_username;
+      if (this.state.filterParam.name) {
+        param.name = this.state.filterParam.name;
       }
-      if (this.state.filterParam.s_aliasname) {
-        param.aliasname__icontains = this.state.filterParam.s_aliasname;
-      }
-      if (this.state.filterParam.s_email) {
-        param.email__icontains = this.state.filterParam.s_email;
-      }
-      if (this.state.filterParam.s_telephone) {
-        param.telephone__icontains = this.state.filterParam.s_telephone;
-      }
-      if (this.state.filterParam.s_role) {
-        param.role = this.state.filterParam.s_role;
-      }
-      if (this.state.filterParam.s_validate) {
-        param.validate = this.state.filterParam.s_validate;
+      if (this.state.filterParam.name_zn) {
+        param.name_zn = this.state.filterParam.name_zn;
       }
     }
 
-    const res = await usermanager.getList(param);
+    const res = await usermanager.getRoleList(param);
     // console.log(res.code);
-    if (!res.code) {
+    if (res.code) {
       return;
     }
 
     if (res) {
       this.setState({
-        total: res.results.count
-      });
-    }
-  }
-
-  /*
-   * 获取角色列表
-   */
-  getRoleList = async () => {
-    const res = await system.getRole();
-    // console.log(res.code);
-    if (!res.code) {
-      return;
-    }
-
-    if (res) {
-      this.setState({
+        total: res.results.total,
         roleList: res.results.data,
       });
     }
   }
+
   /*
    * 有效用户选项
    */
@@ -128,6 +101,7 @@ class Role extends React.PureComponent<IProps, IState> {
       roleList,
     } = this.state;
 
+    console.log(roleList);
     const { getFieldDecorator } = this.props.form;
 
     /**
@@ -136,26 +110,24 @@ class Role extends React.PureComponent<IProps, IState> {
     const del = async (record: any) => {
       const param = {
         id: record.id,
-        domain_id: record.domain_id,
-        username: record.username
       };
-      const res = await usermanager.del(record.id, param);
-      if (res && !res.code) {
+      const res = await usermanager.delRole(record.id, param);
+      if (!res || res.code) {
         message.error(res.msg);
         return;
       }
-      message.success('用户删除成功');
+      message.success('角色删除成功');
       this.getList();
     };
 
     /*
     * 显示添加
     */
-    // const showAdd = () => {
-    //   this.setState({
-    //     showAdd: true
-    //   });
-    // };
+    const showAdd = () => {
+      this.setState({
+        showAdd: true
+      });
+    };
 
     /**
      * 显示编辑
@@ -190,61 +162,71 @@ class Role extends React.PureComponent<IProps, IState> {
     };
 
     /**
+     * 显示权限窗
+     */
+    const showPermission = (record: any) => {
+      this.setState({
+        showPermission: true,
+        editData: record,
+      });
+    };
+
+    /**
      * 用户列
      */
     const column = [
       {
-        title: '用户名',
-        key: 'username',
-        dataIndex: 'username',
+        title: '角色代号',
+        key: 'name',
+        dataIndex: 'name',
         width: 200,
       },
       {
-        title: '姓名',
-        key: 'alias_name',
-        dataIndex: 'alias_name',
+        title: '角色中文名称',
+        key: 'name_zn',
+        dataIndex: 'name_zn',
         width: 200,
       },
-      {
-        title: '角色',
-        key: 'role',
-        dataIndex: 'role',
-        width: 200,
-        render: (text: any) => {
-          // roleList.push({
-          //   description: '神秘用户',
-          //   id: 3
-          // });
-          const role = _.find(roleList, ['id', text]);
-          const roleName = role ? role.description : '';
-          return (<span>{roleName}</span>);
-        }
-      },
-      {
-        title: '邮箱',
-        key: 'email',
-        dataIndex: 'email',
-        width: 200,
-      },
-      {
-        title: '有效用户',
-        key: 'validate',
-        dataIndex: 'validate',
-        width: 200,
-        render: (text: any, record: any) => {
-          return text ? '是' : '否';
-        }
-      },
-      {
-        title: '手机',
-        key: 'telephone',
-        dataIndex: 'telephone',
-        width: 200,
-      },
+      // {
+      //   title: '角色',
+      //   key: 'role',
+      //   dataIndex: 'role',
+      //   width: 200,
+      //   render: (text: any) => {
+      //     // roleList.push({
+      //     //   description: '神秘用户',
+      //     //   id: 3
+      //     // });
+      //     const role = _.find(roleList, ['id', text]);
+      //     const roleName = role ? role.description : '';
+      //     return (<span>{roleName}</span>);
+      //   }
+      // },
+      // {
+      //   title: '邮箱',
+      //   key: 'email',
+      //   dataIndex: 'email',
+      //   width: 200,
+      // },
+      // {
+      //   title: '有效用户',
+      //   key: 'validate',
+      //   dataIndex: 'validate',
+      //   width: 200,
+      //   render: (text: any, record: any) => {
+      //     return text ? '是' : '否';
+      //   }
+      // },
+      // {
+      //   title: '手机',
+      //   key: 'telephone',
+      //   dataIndex: 'telephone',
+      //   width: 200,
+      // },
       {
         title: '创建日期',
-        key: 'create_date',
-        dataIndex: 'create_date',
+        key: 'create_at',
+        dataIndex: 'create_at',
         width: 200,
         render: (text: any, record: any) => {
           return (
@@ -255,18 +237,44 @@ class Role extends React.PureComponent<IProps, IState> {
         }
       },
       {
-        title: '最近登陆',
-        key: 'last_login',
-        dataIndex: 'last_login',
+        title: '更新日期',
+        key: 'update_at',
+        dataIndex: 'update_at',
         width: 200,
         render: (text: any, record: any) => {
           return (
             <span>
-              {text ? moment(text).format('YYYY-MM-DD & HH:mm:ss') : ''}
+              {moment(text).format('YYYY-MM-DD & HH:mm:ss')}
             </span>
           );
         }
       },
+      {
+        title: '权限',
+        key: 'permissions',
+        dataIndex: 'permissions',
+        width: 200,
+        render: (text: any, record: any) => {
+          return (
+            <span>
+              <Button type="link" onClick={() => showPermission(record)}>配置</Button>
+            </span>
+          );
+        }
+      },
+      // {
+      //   title: '最近登陆',
+      //   key: 'last_login',
+      //   dataIndex: 'last_login',
+      //   width: 200,
+      //   render: (text: any, record: any) => {
+      //     return (
+      //       <span>
+      //         {text ? moment(text).format('YYYY-MM-DD & HH:mm:ss') : ''}
+      //       </span>
+      //     );
+      //   }
+      // },
       {
         title: '',
         key: 'action',
@@ -297,26 +305,57 @@ class Role extends React.PureComponent<IProps, IState> {
     };
 
     /**
+     * 模态窗取消
+     */
+    const onPermissionCancel = () => {
+      this.setState({
+        showPermission: false,
+        editData: null
+      });
+    };
+
+    /**
+     * 权限模态窗保存
+     */
+    const onPermissionSave = async () => {
+      console.log(this.state.editData.commitPermissions);
+      const params = {
+        'ids': this.state.editData.commitPermissions,
+      };
+      const res = await usermanager.editRolePermissions(
+        this.state.editData.id,
+        params,
+      );
+      if (res.code) {
+        message.error(res.msg);
+        return;
+      }
+      message.success('角色权限数据保存成功');
+      onPermissionCancel();
+      this.getList();
+    };
+
+    /**
      * 模态窗保存
      */
     const onOk = () => {
       this.props.form.validateFields(/*['loginId'],*/ async (err: boolean, values: any) => {
         if (!err) {
           let res: any = null;
-          console.log(values);
+          // console.log(values);
           if (this.state.editData) {
             // 编辑
             values.id = this.state.editData.id; // body中追加userId
-            res = await usermanager.edit(this.state.editData.id, values);
+            res = await usermanager.editRole(this.state.editData.id, values);
           } else {
-            // 新增
-            res = await usermanager.add(values);
+            // 新增y
+            res = await usermanager.addRole(values);
           }
-          if (!res.code) {
+          if (res.code) {
             message.error(res.msg);
             return;
           }
-          message.success('用户数据保存成功');
+          message.success('角色数据保存成功');
           onCancel();
           this.getList();
         }
@@ -327,7 +366,7 @@ class Role extends React.PureComponent<IProps, IState> {
      * 提交查询
      */
     const onSearch = () => {
-      this.props.form.validateFields(['s_username', 's_aliasname', 's_email', 's_telephone', 's_role', 's_validate'], async (err: boolean, values: any) => {
+      this.props.form.validateFields(['name', 'name_zn'], async (err: boolean, values: any) => {
         if (!err) {
           this.setState({
             filterParam: values
@@ -359,15 +398,11 @@ class Role extends React.PureComponent<IProps, IState> {
           <div className="page-button">
             <CommonButton />
             {/* 下面写本页面需要的按钮 */}
-            {/* <Button type="primary" icon="plus" onClick={() => { showAdd(); }}>新增</Button> */}
+            <Button type="primary" icon="plus" onClick={() => { showAdd(); }}>新增</Button>
             {/* 下面本页的筛选项 */}
             <Select mode="multiple" placeholder="请选择筛选条件" className="filter-select" onChange={changeFilter}>
-              <Option value={'s_username'}>用户名</Option>
-              <Option value={'s_aliasname'}>姓名</Option>
-              <Option value={'s_email'}>邮箱</Option>
-              <Option value={'s_telephone'}>电话号码</Option>
-              <Option value={'s_role'}>角色</Option>
-              <Option value={'s_validate'}>有效用户</Option>
+              <Option value={'name'}>用户名</Option>
+              <Option value={'name_zn'}>姓名</Option>
             </Select>
           </div>
         </div>
@@ -379,78 +414,27 @@ class Role extends React.PureComponent<IProps, IState> {
               <div className="filter-content">
                 <Form className="filter-form" layout="inline" labelCol={{ span: 10 }} wrapperCol={{ span: 14 }}>
                   {
-                    this.state.filterItems.indexOf('s_username') >= 0 &&
-                    <Form.Item label="用户名">
-                      {getFieldDecorator('s_username', {
+                    this.state.filterItems.indexOf('name') >= 0 &&
+                    <Form.Item label="角色代号">
+                      {getFieldDecorator('name', {
                         rules: [],
                       })(
-                        <Input placeholder="请输入用户名称（支持模糊匹配）" />
+                        <Input placeholder="请输入角色代号（支持模糊匹配）" />
                       )}
                     </Form.Item>
                   }
 
                   {
-                    this.state.filterItems.indexOf('s_aliasname') >= 0 &&
-                    <Form.Item label="姓名">
-                      {getFieldDecorator('s_aliasname', {
+                    this.state.filterItems.indexOf('name_zn') >= 0 &&
+                    <Form.Item label="角色中文名称">
+                      {getFieldDecorator('name_zn', {
                         rules: [],
                       })(
                         <Input placeholder="请输入用户姓名（支持模糊匹配）" />
                       )}
                     </Form.Item>
                   }
-                  {
-                    this.state.filterItems.indexOf('s_email') >= 0 &&
-                    <Form.Item label="邮箱">
-                      {getFieldDecorator('s_email', {
-                        rules: [],
-                      })(
-                        <Input placeholder="请输入用户邮箱地址（支持模糊匹配）" />
-                      )}
-                    </Form.Item>
-                  }
-                  {
-                    this.state.filterItems.indexOf('s_telephone') >= 0 &&
-                    <Form.Item label="手机">
-                      {getFieldDecorator('s_telephone', {
-                        rules: [],
-                      })(
-                        <Input placeholder="请输入手机（支持模糊匹配）" />
-                      )}
-                    </Form.Item>
-                  }
-                  {
-                    this.state.filterItems.indexOf('s_role') >= 0 &&
-                    <Form.Item label="角色">
-                      {getFieldDecorator('s_role', {
-                        rules: [],
-                      })(
-                        <Select
-                          style={{ width: 200 }}
-                        >
-                          {roleList.map((role: any) => (
-                            <Option value={role.id} key={role.id}>{role.description}</Option>
-                          ))}
-                        </Select>
-                      )}
-                    </Form.Item>
-                  }
-                  {
-                    this.state.filterItems.indexOf('s_validate') >= 0 &&
-                    <Form.Item label="有效用户">
-                      {getFieldDecorator('s_validate', {
-                        rules: [],
-                      })(
-                        <Select
-                          style={{ width: 200 }}
-                        >
-                          {this.validateList.map((validate: any) => (
-                            <Option value={validate.id} key={validate.id}>{validate.label}</Option>
-                          ))}
-                        </Select>
-                      )}
-                    </Form.Item>
-                  }
+
                   <Form.Item wrapperCol={{ offset: 8 }}>
                     <Button type="primary" onClick={onSearch}>查询</Button>
                   </Form.Item>
@@ -491,7 +475,24 @@ class Role extends React.PureComponent<IProps, IState> {
             {<AddEditModal
               form={this.props.form}
               editData={this.state.editData}
-              roleList={roleList}
+            />}
+          </Modal>
+        }
+        {
+          this.state.showPermission &&
+          <Modal
+            title={'权限配置'}
+            visible={this.state.showPermission}
+            onOk={onPermissionSave}
+            maskClosable={false}
+            onCancel={onPermissionCancel}
+            centered={true}
+            destroyOnClose={true}
+            width={1000}
+          >
+            {<PermissionForm
+              form={this.props.form}
+              editData={this.state.editData}
             />}
           </Modal>
         }
