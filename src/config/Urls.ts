@@ -18,6 +18,13 @@ enum Urls {
   getPermissionsByRid = '/permissions/rid/{id}', // 取得角色拥有的所有权限列表
   editPermissionsByRid = '/permissions/rid/{id}', // 修改角色拥有的所有权限
 
+  // -----------用户管理接口------------
+  getUserList = '/users', // 获取用户列表
+  delUser = '/users/{id}', // 删除单个用户
+  editUser = '/users/{id}', // 编辑用户数据
+  addUser = '/users', // 添加用户数据
+  getUserDetail = '/users/{id}', // 获取单个用户数据
+
   register = '/login/register', // 注册
   getDomainListUnLogin = '/login/domains',  // 不需要token读取组织列表
   getNetElement = '/infra/datadict/netelement', // 获取网元数据列表
@@ -25,10 +32,7 @@ enum Urls {
   editNetElemnt = '/infra/datadict/netelement/{id}/', // 编辑网元数据
   delNetElemnt = '/infra/datadict/netelement/{id}/', // 删除网元数据
   deviceConn = '/infra/netelementmanager/netelement/device_conn/', // 网元连接测试
-  getUserList = '/usermanager/users/', // 获取用户列表
-  delUser = '/usermanager/users/{id}', // 删除单个用户
-  editUser = '/usermanager/users/{id}', // 编辑用户数据
-  addUser = '/usermanager/users/', // 添加用户数据
+  
   getUserManagerDomainList = '/usermanager/domains/', // 获取用户组织列表
   addUserManagerDomain = '/usermanager/domains/', // 新建组织
   editUserManagerDomain = '/usermanager/domains/{id}/', // 修改组织

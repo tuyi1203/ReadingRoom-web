@@ -9,7 +9,7 @@ import http from 'src/utils/ajaxUtils';
  * @param param 参数，IReq类型
  */
 async function del(id: number, param: IReq): Promise<IResult<IResp>> {
-  const resp = await http.deleteWithBody(Urls.delUser.replace('{id}', id.toString()), param);
+  const resp = await http.delete(Urls.delUser.replace('{id}', id.toString()), param);
   return resp;
 }
 

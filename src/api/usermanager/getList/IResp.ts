@@ -2,17 +2,21 @@
  * 出参数据数据接口
  */
 export default interface IResp {
-  count: number;
+  total: number;
   data: {
     id: number,
-    group_ids: number[],
-    domain_name: string,
-    role: string,
-    alias_name: string,
-    domain_id: number,
-    create_date: string,
+    name: string,
+    // group_ids: number[],
+    // domain_name: string,
+    user_info: any[],
+    roles: any[],
+    // alias_name: string,
+    // domain_id: number,
+    created_at: string,
+    updated_at: string,
     email: string,
-    email_msg: string,
+    mobile: string,
+    is_active: number,
   }[];
 
 }

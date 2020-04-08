@@ -1,8 +1,8 @@
 import * as React from 'react';
 import moment from 'moment';
 import * as _ from 'lodash';
-import { usermanager, system } from 'src/api';
-import { Button, Form, message, Table, Divider, Popconfirm, Modal, Select, Input } from 'antd';
+import { usermanager } from 'src/api';
+import { Button, Form, message, Table, Divider, Popconfirm, Modal, Select, Input, Tag } from 'antd';
 import AddEditModal from './addEditForm';
 import CommonButton from 'src/display/components/CommonButton';
 import CurrentPage from 'src/display/components/CurrentPage';
@@ -51,10 +51,10 @@ class User extends React.PureComponent<IProps, IState> {
   }
 
   UNSAFE_componentWillMount() {
-    // this.getList();
+    this.getList();
     // this.getDomainList();
     // this.getGroupList();
-    // this.getRoleList();
+    this.getRoleList();
   }
 
   /*
@@ -66,55 +66,42 @@ class User extends React.PureComponent<IProps, IState> {
       page_size: this.state.pageSize
     };
 
+    console.log(this.state.filterParam);
     // 增加筛选条件
     if (this.state.filterParam) {
-      if (this.state.filterParam.s_username) {
+      
+      /*
+      if (this.state.filterParam.name) {
         param.username__icontains = this.state.filterParam.s_username;
       }
-      if (this.state.filterParam.s_aliasname) {
-        param.aliasname__icontains = this.state.filterParam.s_aliasname;
+      */
+      if (this.state.filterParam.name) {
+        param.name = this.state.filterParam.name;
       }
-      if (this.state.filterParam.s_email) {
-        param.email__icontains = this.state.filterParam.s_email;
+      if (this.state.filterParam.email) {
+        param.email = this.state.filterParam.email;
       }
-      if (this.state.filterParam.s_telephone) {
-        param.telephone__icontains = this.state.filterParam.s_telephone;
+      if (this.state.filterParam.mobile) {
+        param.mobile = this.state.filterParam.mobile;
       }
-      if (this.state.filterParam.s_role) {
-        param.role = this.state.filterParam.s_role;
+      if (this.state.filterParam.roles) {
+        param.roles = this.state.filterParam.roles;
       }
-      if (this.state.filterParam.s_validate) {
-        param.validate = this.state.filterParam.s_validate;
+      if (typeof(this.state.filterParam.is_active) !== 'undefined') {
+        param.is_active = this.state.filterParam.is_active;
       }
     }
 
     const res = await usermanager.getList(param);
     // console.log(res.code);
-    if (!res.code) {
+    if (res.code) {
       return;
     }
 
     if (res) {
       this.setState({
         userList: res.results.data,
-        total: res.results.count
-      });
-    }
-  }
-
-  /*
-   * 获取域列表
-   */
-  getDomainList = async () => {
-    const res = await usermanager.getDomainList({});
-    // console.log(res);
-    if (!res.code) {
-      return;
-    }
-
-    if (res) {
-      this.setState({
-        domainList: res.results.data,
+        total: res.results.total
       });
     }
   }
@@ -123,9 +110,12 @@ class User extends React.PureComponent<IProps, IState> {
    * 获取角色列表
    */
   getRoleList = async () => {
-    const res = await system.getRole();
+    const res = await usermanager.getRoleList({
+      page: 1,
+      page_size: 1000,
+    });
     // console.log(res.code);
-    if (!res.code) {
+    if (res.code) {
       return;
     }
 
@@ -178,13 +168,9 @@ class User extends React.PureComponent<IProps, IState> {
      * 删除一行数据
      */
     const del = async (record: any) => {
-      const param = {
-        id: record.id,
-        domain_id: record.domain_id,
-        username: record.username
-      };
+      const param = {};
       const res = await usermanager.del(record.id, param);
-      if (res && !res.code) {
+      if (res.code) {
         message.error(res.msg);
         return;
       }
@@ -238,31 +224,10 @@ class User extends React.PureComponent<IProps, IState> {
      */
     const column = [
       {
-        title: '用户名',
-        key: 'username',
-        dataIndex: 'username',
-        width: 200,
-      },
-      {
         title: '姓名',
-        key: 'alias_name',
-        dataIndex: 'alias_name',
+        key: 'name',
+        dataIndex: 'name',
         width: 200,
-      },
-      {
-        title: '角色',
-        key: 'role',
-        dataIndex: 'role',
-        width: 200,
-        render: (text: any) => {
-          // roleList.push({
-          //   description: '神秘用户',
-          //   id: 3
-          // });
-          const role = _.find(roleList, ['id', text]);
-          const roleName = role ? role.description : '';
-          return (<span>{roleName}</span>);
-        }
       },
       {
         title: '邮箱',
@@ -271,9 +236,23 @@ class User extends React.PureComponent<IProps, IState> {
         width: 200,
       },
       {
+        title: '角色',
+        key: 'roles',
+        dataIndex: 'roles',
+        width: 200,
+        render: (text: any, record: any) => {
+          const roles = record.roles;
+          return (
+            <span>{roles.map((item: any) => {
+              return (<Tag key={item.id}>{item.name_zn}</Tag>);
+            })}</span>
+          );
+        }
+      },
+      {
         title: '有效用户',
-        key: 'validate',
-        dataIndex: 'validate',
+        key: 'is_active',
+        dataIndex: 'is_active',
         width: 200,
         render: (text: any, record: any) => {
           return text ? '是' : '否';
@@ -281,14 +260,14 @@ class User extends React.PureComponent<IProps, IState> {
       },
       {
         title: '手机',
-        key: 'telephone',
-        dataIndex: 'telephone',
+        key: 'mobile',
+        dataIndex: 'mobile',
         width: 200,
       },
       {
         title: '创建日期',
-        key: 'create_date',
-        dataIndex: 'create_date',
+        key: 'created_at',
+        dataIndex: 'created_at',
         width: 200,
         render: (text: any, record: any) => {
           return (
@@ -299,18 +278,31 @@ class User extends React.PureComponent<IProps, IState> {
         }
       },
       {
-        title: '最近登陆',
-        key: 'last_login',
-        dataIndex: 'last_login',
+        title: '更新日期',
+        key: 'updated_at',
+        dataIndex: 'updated_at',
         width: 200,
         render: (text: any, record: any) => {
           return (
             <span>
-              {text ? moment(text).format('YYYY-MM-DD & HH:mm:ss') : ''}
+              {moment(text).format('YYYY-MM-DD & HH:mm:ss')}
             </span>
           );
         }
       },
+      // {
+      //   title: '最近登陆',
+      //   key: 'last_login',
+      //   dataIndex: 'last_login',
+      //   width: 200,
+      //   render: (text: any, record: any) => {
+      //     return (
+      //       <span>
+      //         {text ? moment(text).format('YYYY-MM-DD & HH:mm:ss') : ''}
+      //       </span>
+      //     );
+      //   }
+      // },
       {
         title: '',
         key: 'action',
@@ -373,7 +365,7 @@ class User extends React.PureComponent<IProps, IState> {
      * 提交查询
      */
     const onSearch = () => {
-      this.props.form.validateFields(['s_username', 's_aliasname', 's_email', 's_telephone', 's_role', 's_validate'], async (err: boolean, values: any) => {
+      this.props.form.validateFields(['name', 'email', 'mobile', 'roles', 'is_active'], async (err: boolean, values: any) => {
         if (!err) {
           this.setState({
             filterParam: values
@@ -408,12 +400,11 @@ class User extends React.PureComponent<IProps, IState> {
             {/* <Button type="primary" icon="plus" onClick={() => { showAdd(); }}>新增</Button> */}
             {/* 下面本页的筛选项 */}
             <Select mode="multiple" placeholder="请选择筛选条件" className="filter-select" onChange={changeFilter}>
-              <Option value={'s_username'}>用户名</Option>
-              <Option value={'s_aliasname'}>姓名</Option>
-              <Option value={'s_email'}>邮箱</Option>
-              <Option value={'s_telephone'}>电话号码</Option>
-              <Option value={'s_role'}>角色</Option>
-              <Option value={'s_validate'}>有效用户</Option>
+              <Option value={'name'}>姓名</Option>
+              <Option value={'email'}>邮箱</Option>
+              <Option value={'mobile'}>电话号码</Option>
+              <Option value={'roles'}>角色</Option>
+              <Option value={'is_active'}>有效用户</Option>
             </Select>
           </div>
         </div>
@@ -424,7 +415,7 @@ class User extends React.PureComponent<IProps, IState> {
               this.state.filterItems && this.state.filterItems.length > 0 &&
               <div className="filter-content">
                 <Form className="filter-form" layout="inline" labelCol={{ span: 10 }} wrapperCol={{ span: 14 }}>
-                  {
+                  {/* {
                     this.state.filterItems.indexOf('s_username') >= 0 &&
                     <Form.Item label="用户名">
                       {getFieldDecorator('s_username', {
@@ -433,12 +424,12 @@ class User extends React.PureComponent<IProps, IState> {
                         <Input placeholder="请输入用户名称（支持模糊匹配）" />
                       )}
                     </Form.Item>
-                  }
+                  } */}
 
                   {
-                    this.state.filterItems.indexOf('s_aliasname') >= 0 &&
+                    this.state.filterItems.indexOf('name') >= 0 &&
                     <Form.Item label="姓名">
-                      {getFieldDecorator('s_aliasname', {
+                      {getFieldDecorator('name', {
                         rules: [],
                       })(
                         <Input placeholder="请输入用户姓名（支持模糊匹配）" />
@@ -446,9 +437,9 @@ class User extends React.PureComponent<IProps, IState> {
                     </Form.Item>
                   }
                   {
-                    this.state.filterItems.indexOf('s_email') >= 0 &&
+                    this.state.filterItems.indexOf('email') >= 0 &&
                     <Form.Item label="邮箱">
-                      {getFieldDecorator('s_email', {
+                      {getFieldDecorator('email', {
                         rules: [],
                       })(
                         <Input placeholder="请输入用户邮箱地址（支持模糊匹配）" />
@@ -456,9 +447,9 @@ class User extends React.PureComponent<IProps, IState> {
                     </Form.Item>
                   }
                   {
-                    this.state.filterItems.indexOf('s_telephone') >= 0 &&
+                    this.state.filterItems.indexOf('mobile') >= 0 &&
                     <Form.Item label="手机">
-                      {getFieldDecorator('s_telephone', {
+                      {getFieldDecorator('mobile', {
                         rules: [],
                       })(
                         <Input placeholder="请输入手机（支持模糊匹配）" />
@@ -466,25 +457,25 @@ class User extends React.PureComponent<IProps, IState> {
                     </Form.Item>
                   }
                   {
-                    this.state.filterItems.indexOf('s_role') >= 0 &&
+                    this.state.filterItems.indexOf('roles') >= 0 &&
                     <Form.Item label="角色">
-                      {getFieldDecorator('s_role', {
+                      {getFieldDecorator('roles', {
                         rules: [],
                       })(
                         <Select
                           style={{ width: 200 }}
                         >
                           {roleList.map((role: any) => (
-                            <Option value={role.id} key={role.id}>{role.description}</Option>
+                            <Option value={role.id} key={role.id}>{role.name_zn}</Option>
                           ))}
                         </Select>
                       )}
                     </Form.Item>
                   }
                   {
-                    this.state.filterItems.indexOf('s_validate') >= 0 &&
+                    this.state.filterItems.indexOf('is_active') >= 0 &&
                     <Form.Item label="有效用户">
-                      {getFieldDecorator('s_validate', {
+                      {getFieldDecorator('is_active', {
                         rules: [],
                       })(
                         <Select
