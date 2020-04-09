@@ -69,7 +69,7 @@ class User extends React.PureComponent<IProps, IState> {
     console.log(this.state.filterParam);
     // 增加筛选条件
     if (this.state.filterParam) {
-      
+
       /*
       if (this.state.filterParam.name) {
         param.username__icontains = this.state.filterParam.s_username;
@@ -87,7 +87,7 @@ class User extends React.PureComponent<IProps, IState> {
       if (this.state.filterParam.roles) {
         param.roles = this.state.filterParam.roles;
       }
-      if (typeof(this.state.filterParam.is_active) !== 'undefined') {
+      if (typeof (this.state.filterParam.is_active) !== 'undefined') {
         param.is_active = this.state.filterParam.is_active;
       }
     }
@@ -322,6 +322,15 @@ class User extends React.PureComponent<IProps, IState> {
       },
     ];
 
+    /*
+    * 显示添加
+    */
+    const showAdd = () => {
+      this.setState({
+        showAdd: true
+      });
+    };
+
     /**
      * 模态窗保存
      */
@@ -340,17 +349,28 @@ class User extends React.PureComponent<IProps, IState> {
         if (!err) {
           let res: any = null;
           console.log(values);
-          const domainInfo = _.find(domainList, ['id', values.domain_id]);
-          values.domain_name = (domainInfo && domainInfo.name) || '';
           if (this.state.editData) {
             // 编辑
-            values.id = this.state.editData.id; // body中追加userId
+            if (!values.is_active) {
+              values.is_active = 0;
+            } else {
+              values.is_active = 1;
+            }
+            if (_.isEmpty(values.password)) {
+              values = {
+                name: values.name,
+                email: values.email,
+                mobile: values.mobile,
+                roles: values.roles,
+                is_active: values.is_active,
+              };
+            }
             res = await usermanager.edit(this.state.editData.id, values);
           } else {
             // 新增
             res = await usermanager.add(values);
           }
-          if (!res.code) {
+          if (res.code) {
             message.error(res.msg);
             return;
           }
@@ -397,7 +417,7 @@ class User extends React.PureComponent<IProps, IState> {
           <div className="page-button">
             <CommonButton />
             {/* 下面写本页面需要的按钮 */}
-            {/* <Button type="primary" icon="plus" onClick={() => { showAdd(); }}>新增</Button> */}
+            <Button type="primary" icon="plus" onClick={() => { showAdd(); }}>新增</Button>
             {/* 下面本页的筛选项 */}
             <Select mode="multiple" placeholder="请选择筛选条件" className="filter-select" onChange={changeFilter}>
               <Option value={'name'}>姓名</Option>

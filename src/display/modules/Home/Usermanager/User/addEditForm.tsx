@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Form, Input, Radio, Switch, Select } from 'antd';
+import { Form, Input, Switch, Select } from 'antd';
 import CommonUtils from 'src/utils/commonUtils';
 // import { usermanager } from 'src/api';
 
@@ -51,8 +51,9 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
   }
 
   render() {
-    const { editData, roleList, domainList, groupList } = this.props;
+    const { editData, roleList } = this.props;
     const { getFieldDecorator } = this.props.form;
+    console.log(roleList);
     // console.log(groupList);
     /**
      * 校验确认密码
@@ -68,8 +69,19 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
      * 校验手机号码
      */
     const validateMobile = (rule: any, value: any, callback: any) => {
-      if (!value || !CommonUtils.regex('mobile', value)) {
+      if (!CommonUtils.regex('mobile', value)) {
         callback('请输入正确的手机号码！');
+      }
+      callback();
+    };
+
+    /**
+     * 校验密码
+     */
+    const validatePasswordConfirm = (rule: any, value: any, callback: any) => {
+      const passwordValue = this.props.form.getFieldValue('password');
+      if (passwordValue !== value) {
+        callback('两次密码应该一致');
       }
       callback();
     };
@@ -82,8 +94,8 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
       if (roleList && roleList.length > 0) {
         roleList.forEach((p: any) => {
           list.push({
-            label: p.description,
-            value: p.id
+            label: p.name_zn,
+            value: p.name
           });
         });
       }
@@ -93,6 +105,7 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
     /**
      * 获取域选项
      */
+    /*
     const getDomainOptions = () => {
       const list: any[] = [];
       if (domainList && domainList.length > 0) {
@@ -105,10 +118,12 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
       }
       return list;
     };
+    */
 
     /**
      * 组织选中值发生变化时改变相关信息
      */
+    /*
     const onChangeDomain = (domainId: number) => {
       const list: any[] = [];
       if (groupList && groupList.length > 0) {
@@ -128,22 +143,13 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
         'group_ids': null,
       });
     };
+    */
 
     return (
       <Form className="modal-form" layout="inline" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
-        <FormItem label="用户名">
-          {getFieldDecorator('username', {
-            initialValue: editData ? editData.username : null,
-            rules: [
-              { required: true, message: '请输入用户名' }
-            ],
-          })(
-            <Input disabled={editData ? true : false} />
-          )}
-        </FormItem>
         <FormItem label="姓名">
-          {getFieldDecorator('alias_name', {
-            initialValue: editData ? editData.alias_name : null,
+          {getFieldDecorator('name', {
+            initialValue: editData ? editData.name : null,
             rules: [
               { required: true, message: '请输入姓名' }
             ],
@@ -151,14 +157,26 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
             <Input />
           )}
         </FormItem>
-        <FormItem label="描述">
-          {getFieldDecorator('description', {
-            initialValue: editData ? editData.description : null,
-            rules: [
-              // { required: true, message: '请输入姓名' }
+        <FormItem label="密码">
+          {getFieldDecorator('password', {
+            initialValue: null,
+            rules: editData ? null : [
+              { required: true, message: '请输入正确的密码' }
             ],
           })(
-            <Input />
+            <Input type="password" />
+          )}
+        </FormItem>
+        <FormItem label="确认密码">
+          {getFieldDecorator('password_confirm', {
+            initialValue: null,
+            rules: editData ? null : [
+              { required: true, message: '请输入正确的确认密码' },
+              { validator: validatePasswordConfirm }
+            ],
+            validateFirst: true
+          })(
+            <Input type="password" />
           )}
         </FormItem>
         <FormItem label="邮箱">
@@ -171,17 +189,6 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
             <Input />
           )}
         </FormItem>
-        {!editData
-          && <FormItem label="邮件信息">
-            {getFieldDecorator('email_msg', {
-              initialValue: editData ? editData.email_msg : null,
-              rules: [
-                { required: true, message: '请输入邮件信息' }
-              ],
-            })(
-              <Input />
-            )}
-          </FormItem>}
         {/* {editData &&
           <FormItem label="密码">
             {getFieldDecorator('password', {
@@ -195,26 +202,35 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
           </FormItem>
         } */}
         <FormItem label="手机">
-          {getFieldDecorator('telephone', {
-            initialValue: editData ? editData.telephone : null,
+          {getFieldDecorator('mobile', {
+            initialValue: editData ? editData.mobile : null,
             rules: [
+              { required: true, message: '请输入手机号' },
               { validator: validateMobile }
             ],
+            validateFirst: true
           })(
             <Input />
           )}
         </FormItem>
         <FormItem label="用户角色">
-          {getFieldDecorator('role', {
-            initialValue: editData ? editData.role : null,
+          {getFieldDecorator('roles', {
+            initialValue: editData ? editData.roles.map((role: any) => role.name) : [],
             rules: [
               { required: true, message: '请选择用户角色' }
             ],
           })(
-            <Radio.Group options={getRoleOptions()} />
+            <Select
+              style={{ width: 200 }}
+              mode="multiple"
+            >
+              {getRoleOptions().map((role: any) => (
+                <Option value={role.value} key={role.value}>{role.label}</Option>
+              ))}
+            </Select>
           )}
         </FormItem>
-        <FormItem label="组织">
+        {/* <FormItem label="组织">
           {getFieldDecorator('domain_id', {
             initialValue: editData ? editData.domain_id : null,
             rules: [
@@ -232,8 +248,8 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
               ))}
             </Select>
           )}
-        </FormItem>
-        {editData &&
+        </FormItem> */}
+        {/* {editData &&
           <FormItem label="空间">
             {getFieldDecorator('group_ids', {
               initialValue: editData ? editData.group_ids : null,
@@ -252,12 +268,12 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
               </Select>
             )}
           </FormItem>
-        }
+        } */}
         {editData &&
           <FormItem label="有效用户">
-            {getFieldDecorator('validate', {
+            {getFieldDecorator('is_active', {
               valuePropName: 'checked',
-              initialValue: editData.validate,
+              initialValue: editData.is_active ? true : false,
             })(
               <Switch checkedChildren="是" unCheckedChildren="否" />
             )}
