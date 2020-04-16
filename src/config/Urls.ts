@@ -3,7 +3,6 @@ enum Urls {
   qrLogin = '/qrlogin', // 微信扫码登陆
   getVerifyCode = '/getverifycode', // 取得短信验证码
   bindLogin = '/bindlogin', // 微信绑定登陆
-
   getLoginQRCode = '/wechat/getloginqrcode', // 取得微信登陆二维码
 
   basicLogin = '/login/basic', // 基础登录地址
@@ -24,6 +23,11 @@ enum Urls {
   editUser = '/users/{id}', // 编辑用户数据
   addUser = '/users', // 添加用户数据
   getUserDetail = '/users/{id}', // 获取单个用户数据
+
+  // -----------职称填报接口------------
+  getBaseInfoDetail = '/progress/baseinfo/detail/', // 获取基本信息
+  addOrEditBaseInfo = '/progress/baseinfo/edit/', // 添加或修改基本信息
+  getDictList = '/progress/dict/', // 获取数据字典列表
 
   register = '/login/register', // 注册
   getDomainListUnLogin = '/login/domains',  // 不需要token读取组织列表

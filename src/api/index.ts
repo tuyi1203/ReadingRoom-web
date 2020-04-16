@@ -15,3 +15,4 @@ export { default as linemanager } from './linemanager';
 export { default as contractmanager } from './contractmanager';
 export { default as attaches } from './attaches';
 export { default as wechat } from './wechat';
+export { default as progress } from './progress';

@@ -242,8 +242,8 @@ class Login extends React.Component<IProps, IState> {
     storageUtils.remove(Constant.SENCE_ID);
 
     // 跳转到dashboard
-    this.props.history.push('/usermanager/user');
-    // this.props.history.push('/dashboard');
+    // this.props.history.push('/usermanager/user');
+    this.props.history.push('/progress/baseinfo');
   }
 
   /**
