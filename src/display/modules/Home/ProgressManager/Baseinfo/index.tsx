@@ -14,12 +14,12 @@ import {
   Switch,
   Select,
   Input,
-  DatePicker,
+  // DatePicker,
   // Tag
 } from 'antd';
 import CommonButton from 'src/display/components/CommonButton';
 import CurrentPage from 'src/display/components/CurrentPage';
-import locale from 'antd/es/date-picker/locale/zh_CN';
+// import locale from 'antd/es/date-picker/locale/zh_CN';
 
 moment.locale('zh-cn');
 const { Option } = Select;
@@ -510,7 +510,7 @@ class BaseInfo extends React.PureComponent<IProps, IState> {
                   </FormItem>
                 </Col>
               </Row>
-              <Row>
+              {/* <Row>
                 <Col span={8}>
                   <FormItem label="最后毕业院校">
                     {getFieldDecorator('graduate_school', {
@@ -604,7 +604,7 @@ class BaseInfo extends React.PureComponent<IProps, IState> {
                     )}
                   </FormItem>
                 </Col>
-              </Row>
+              </Row> */}
               {/* <FormItem label="手机">
                 {getFieldDecorator('mobile', {
                   initialValue: editData ? editData.mobile : null,
