@@ -121,6 +121,27 @@ var http = {
     });
   },
 
+  /**
+   * 发送get请求获取文件二进制流
+   * @param url 请求地址，相对Url
+   * @param params 请求参数，JSON对象
+   */
+  getFile: function (url: string, params: any): any {
+    params = params || {};
+    return new Promise((resolve, reject) => {
+      _axios.get(url,
+        {
+          params: params,
+          headers: getHeader(),
+          responseType: 'blob'
+        }).then((res) => {
+          resolve(res);
+        }).catch((error) => {
+          reject(error);
+        });
+    });
+  },
+
   // /**
   //  * 发送patch请求
   //  * @param url 请求地址，相对url

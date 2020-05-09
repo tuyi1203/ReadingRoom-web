@@ -11,7 +11,7 @@ export interface IState {
 
 }
 
-class ProgressManager extends React.Component<IProps, IState> {
+class Progress extends React.Component<IProps, IState> {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -27,4 +27,4 @@ class ProgressManager extends React.Component<IProps, IState> {
   }
 }
 
-export default ProgressManager;
+export default Progress;

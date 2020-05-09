@@ -1,0 +1,226 @@
+import * as React from 'react';
+import {
+  // Input, 
+  Form, Select,
+  // DatePicker
+} from 'antd';
+import { EditableContext } from './editableRow';
+// import locale from 'antd/es/date-picker/locale/zh_CN';
+// import moment from 'moment';
+
+/** Props接口，定义需要用到的Porps类型 */
+export interface IProps {
+  form: any;
+  record: any;
+  handleSave: any;
+  dataIndex: string;
+  title: string;
+  children: any;
+  editable: boolean;
+  index: number;
+  kaoheoptions: any;
+  yearoptions: any;
+}
+
+/** State接口，定义需要用到的State类型，constructor中的state应该和此定义的类型一致 */
+export interface IState {
+  editing: boolean;
+}
+
+const { Option } = Select;
+
+class EditableCell extends React.PureComponent<IProps, IState> {
+
+  input: any;
+  // yearOptions: any[];
+  // form: any;
+
+  constructor(props: any) {
+    super(props);
+    // this.yearOptions = [];
+    this.state = {
+      editing: false,
+    };
+   
+  }
+
+  render() {
+    const {
+      editable,
+      dataIndex,
+      title,
+      record,
+      index,
+      handleSave,
+      children,
+      kaoheoptions,
+      yearoptions,
+      ...restProps
+    } = this.props;
+
+    const { getFieldDecorator } = this.props.form;
+
+    const toggleEdit = () => {
+      const editing = !this.state.editing;
+      this.setState({ editing }, () => {
+        if (editing && this.input) {
+          this.input.focus();
+        }
+      });
+    };
+
+    // const save = (e: any) => {
+    //   const { record, handleSave } = this.props;
+    //   this.props.form.validateFields(/*['loginId'],*/ async (err: boolean, values: any) => {
+    //     if (err) {
+    //       return;
+    //     }
+    //     toggleEdit();
+    //     handleSave({ ...record, ...values });
+    //   });
+    // };
+
+    /**
+     * 单选改变时的回调
+     */
+    const onChange = (value: any) => {
+      const { record, handleSave, dataIndex } = this.props;
+      // console.log(record);
+      this.props.form.validateFields(/*['loginId'],*/ async (err: boolean, values: any) => {
+        if (err) {
+          return;
+        }
+        console.log(values);
+        let param = {
+          kaohe_level: record.kaohe_level,
+          niandu_start: record.niandu_start,
+          niandu_end: record.niandu_end,
+          key: record.key,
+        };
+
+        if (dataIndex === 'kaohe_level') {
+          param.kaohe_level = value;
+        } else if (dataIndex === 'niandu_start') {
+          param.niandu_start = value;
+        } else if (dataIndex === 'niandu_end') {
+          param.niandu_end = value;
+        }
+
+        handleSave({ ...param });
+        // toggleEdit();
+      });
+    };
+
+    /**
+     * 年度改变时的回调
+     */
+    // const onDateChange = (type: string, value: any) => {
+    //   const { record, handleSave } = this.props;
+    //   console.log(record);
+    //   this.props.form.validateFields(/*['loginId'],*/ async (err: boolean, values: any) => {
+    //     if (err) {
+    //       return;
+    //     }
+    //     let param = {
+    //       kaohe: record.value,
+    //       niandu_start: record.niand_start,
+    //       niandu_end: record.niandu_end,
+    //       key: record.key,
+    //     };
+    //     if (type === 'niandu_start') {
+    //       param.niandu_start = value;
+    //     } else if (type === 'niandu_end') {
+    //       param.niandu_end = value;
+    //     }
+
+    //     handleSave({ ...param });
+    //     // toggleEdit();
+    //   });
+    // };
+
+    const renderCell = (form: any) => {
+      // this.form = form;
+      const { children, dataIndex, record, title } = this.props;
+      const { editing } = this.state;
+      console.log(record, dataIndex, children);
+      return editing ? (dataIndex === 'kaohe_level' ? (
+        <Form.Item style={{ margin: 0 }}>
+          {getFieldDecorator(dataIndex, {
+            initialValue: record[dataIndex].toString(),
+            rules: [
+              { required: true, message: '请选择考核等级' }
+            ],
+          })(
+            <Select
+              style={{ width: 200 }}
+              // ref={this.mySelectRef}
+              onChange={onChange}
+            // onBlur={save}
+            >
+              {kaoheoptions.map((item: any) => (
+                <Option value={item.value} key={item.value}>{item.label}</Option>
+              ))}
+            </Select>
+          )}
+        </Form.Item>
+      ) :
+        (
+          <Form.Item style={{ margin: 0 }}>
+            {
+              getFieldDecorator(dataIndex, {
+                rules: [
+                  {
+                    required: true,
+                    message: `${title}不能为空`,
+                  },
+                ],
+                // initialValue: moment(record[dataIndex], 'YYYY'),
+                initialValue: record[dataIndex],
+              })
+                // (<Input ref={node => (this.input = node)} onPressEnter={save} onBlur={save} />)
+                // (<DatePicker
+                //   locale={locale}
+                //   format="YYYY"
+                //   onChange={onDateChange.bind(this, dataIndex)}
+                //   allowClear={false}
+                //   mode="year"
+                // />)
+                (<Select
+                  style={{ width: 200 }}
+                  onChange={onChange}
+                // onBlur={save}
+                >
+                  {yearoptions.map((item: any) => (
+                    <Option value={item.value} key={item.value}>{item.label}</Option>
+                  ))}
+                </Select>)
+            }
+          </Form.Item >
+        )) : (
+          <div
+            className="editable-cell-value-wrap"
+            style={{ paddingRight: 24 }}
+            onClick={toggleEdit}
+          >
+            {dataIndex !== 'kaohe_level' ? record[dataIndex] : (kaoheoptions.filter((item: any) => {
+              return item.value === record[dataIndex];
+            }).length ? kaoheoptions.filter((item: any) => {
+              return item.value === record[dataIndex];
+            })[0].label : record[dataIndex])}
+          </div>
+        );
+    };
+
+    return (
+      <td {...restProps}>
+        {editable ? (
+          <EditableContext.Consumer>{renderCell}</EditableContext.Consumer>
+        ) : (
+            children
+          )}
+      </td>
+    );
+  }
+}
+
+export default Form.create()(EditableCell);

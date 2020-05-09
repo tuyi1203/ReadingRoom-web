@@ -1,29 +1,43 @@
 import * as React from 'react';
 import moment from 'moment';
 import _ from 'lodash';
-import { progress } from 'src/api';
+import { progress, files } from 'src/api';
+import Constant from 'src/dataModel/Constant';
+import IToken from 'src/dataModel/IToken';
 import {
-  // Button,
   Form,
   Row,
-  Col,
+  // Col,
   message,
+  Tabs,
+  Descriptions,
+  Badge,
+  Upload,
+  Button,
+  Icon,
+  List,
+  Typography,
   // Table,
   // Divider,
-  // Popconfirm,
+  Popconfirm,
   Switch,
-  Select,
+  // Select,
   Input,
   // DatePicker,
   // Tag
 } from 'antd';
 import CommonButton from 'src/display/components/CommonButton';
 import CurrentPage from 'src/display/components/CurrentPage';
-// import locale from 'antd/es/date-picker/locale/zh_CN';
+import Urls from 'src/config/Urls';
+import storageUtils from 'src/utils/storageUtils';
+import EditableTable from './editableTable';
+import './index.css';
 
 moment.locale('zh-cn');
-const { Option } = Select;
+// const { Option } = Select;
 const FormItem = Form.Item;
+const { TabPane } = Tabs;
+const { TextArea } = Input;
 
 /** Props接口，定义需要用到的Porps类型 */
 export interface IProps {
@@ -35,39 +49,41 @@ export interface IState {
   page: number;
   pageSize: number;
   total: number;
-  userList: any;
-  roleList: any;
-  domainList: any;
-  groupList: any;
-  dictList: any;
+  dictList: any[];
   showAdd: boolean;
   editData: any;
   filterItems: string[];
   filterParam: any;
   editAble: boolean;
+  defaultActiveKey: string;
+  attachList: any;
+  uploadedFiles: any[];
 }
 
 /**
- * BaseInfo
+ * Moral
  */
 class Moral extends React.PureComponent<IProps, IState> {
+
+  tableData: any[];
+
   constructor(props: any) {
     super(props);
     this.state = {
       page: 1,
       pageSize: 10,
       total: 0, // 总条数
-      userList: [], // 用户列表
-      roleList: [], // 角色列表
-      domainList: [], // 获取域列表
-      groupList: [], // 获取组织列表
       dictList: [], // 获取数据字典列表
       showAdd: false, // 是否显示添加
       editData: null, // 编辑数据
       filterItems: [], // 显示的筛选项
       filterParam: {}, // 筛选对象数据
       editAble: false,
+      defaultActiveKey: '1',
+      attachList: [], // 附件列表
+      uploadedFiles: [], // 已上传文件ID列表
     };
+    this.tableData = [];
   }
 
   UNSAFE_componentWillMount() {
@@ -76,26 +92,85 @@ class Moral extends React.PureComponent<IProps, IState> {
   }
 
   /*
+   * 改变年度考核数据
+   */
+  changeTableData = (newData: any) => {
+    this.tableData = newData;
+    console.log(this.tableData);
+  }
+
+  /*
    * 获取用户职称基本信息
    */
   getDetail = async () => {
-    const res = await progress.getBaseInfoDetail({});
+    let params: any;
+    if (this.state.defaultActiveKey === '1') {
+      params = {
+        category: 'summary'
+      };
+    } else if (this.state.defaultActiveKey === '2') {
+      params = {
+        category: 'kaohe'
+      };
+    } else if (this.state.defaultActiveKey === '3') {
+      params = {
+        category: 'warning'
+      };
+    } else if (this.state.defaultActiveKey === '4') {
+      params = {
+        category: 'punish'
+      };
+    }
+    const res = await progress.getMoralDetail(params);
 
     if (res.code) {
+      message.error(res.msg);
       return;
     }
 
-    if (res) {
-      this.setState({
-        editData: res.results.data,
-      }, () => {
-        if (!this.state.editData) {
-          this.setState({
-            editAble: true,
-          });
-        }
-      });
+    this.setState({
+      editData: res.results.data,
+    }, () => {
+      if (!this.state.editData) {
+        this.setState({
+          editAble: true,
+        });
+      }
+      this.getAttachList();
+    });
+  }
+
+  /**
+   * 取得印证材料列表
+   */
+  getAttachList = async () => {
+    let params: any = {};
+    if (this.state.defaultActiveKey === '1') {
+      params.bize_type = 'moral/summary';
     }
+
+    if (this.state.defaultActiveKey === '2') {
+      params.bize_type = 'moral/kaohe';
+    }
+
+    if (this.state.defaultActiveKey === '3') {
+      params.bize_type = 'moral/warning';
+    }
+
+    if (this.state.defaultActiveKey === '4') {
+      params.bize_type = 'moral/punish';
+    }
+
+    params.bize_id = this.state.editData ? this.state.editData.id : null;
+
+    const res = await files.getFileList(params);
+    if (res.code) {
+      message.error(res.msg);
+      return;
+    }
+    this.setState({
+      attachList: res.results.data
+    });
   }
 
   /*
@@ -104,14 +179,7 @@ class Moral extends React.PureComponent<IProps, IState> {
   getDictList = async () => {
     const res = await progress.getDictList({
       'category_name': [
-        'gender',
-        'min_zu',
-        'company_type',
-        'series',
-        'course',
-        'position',
-        'review_team',
-        'education',
+        'kaohe_level',
       ],
     });
 
@@ -130,20 +198,75 @@ class Moral extends React.PureComponent<IProps, IState> {
 
     const {
       editData,
-      dictList,
+      attachList,
       editAble,
+      dictList,
     } = this.state;
 
     const { getFieldDecorator } = this.props.form;
+    const uploadAttachUrl = window.$$_web_env.apiDomain + Urls.addFile;
+
+    /**
+     * 获取token
+     */
+    const getToken = () => {
+      let token: string = '';
+      const loginInfoStr = storageUtils.get(Constant.LOGIN_KEY);
+      if (loginInfoStr && loginInfoStr.length > 0) {
+        const tokenInfo: IToken = JSON.parse(loginInfoStr);
+        if (tokenInfo !== null && tokenInfo.token) {
+          token = 'Bearer ' + tokenInfo.token;
+        }
+      }
+      return token;
+    };
+
+    /**
+     * 删除附件
+     */
+    const del = async (record: any) => {
+      const res = await files.delFile(record.id, {});
+      if (res && res.code) {
+        message.error(res.msg);
+        return;
+      }
+      message.success('删除成功');
+      this.getAttachList();
+    };
+
+    /**
+     * 文件上传
+     */
+    const onUplodChange = async (info: any) => {
+      if (info.file.status !== 'uploading') {
+        console.log(info.file, info.fileList);
+      }
+      if (info.file.status === 'done') {
+        if (!info.file.response.code) {
+          // 如果上传成功
+          const { uploadedFiles } = this.state;
+          uploadedFiles.push(info.file.response.results.data.fileId);
+          this.setState({
+            uploadedFiles
+          }, () => {
+            this.getAttachList();
+          });
+        } else {
+          message.error(info.file.response.msg);
+        }
+      } else if (info.file.status === 'error') {
+        message.error(`${info.file.name} 上传失败.`);
+      }
+    };
 
     /*
      * 获取数据字典中某个类别的列表
      */
-    const getOption = (keyName: string): any[] => {
+    const getOptions = (keyName: string): any[] => {
       const list: any[] = [];
       if (!_.isEmpty(dictList)) {
         const data = dictList[keyName];
-        console.log(data);
+        // console.log(data);
 
         data.map((item: any) => {
           list.push({
@@ -176,56 +299,6 @@ class Moral extends React.PureComponent<IProps, IState> {
      */
 
     /**
-     * 模态窗保存
-     */
-    // const onCancel = () => {
-    //   this.setState({
-    //     showAdd: false,
-    //     editData: null
-    //   });
-    // };
-
-    /**
-     * 模态窗保存
-     */
-    // const onOk = () => {
-    //   this.props.form.validateFields(/*['loginId'],*/ async (err: boolean, values: any) => {
-    //     if (!err) {
-    //       let res: any = null;
-    //       console.log(values);
-    //       if (this.state.editData) {
-    //         // 编辑
-    //         if (!values.is_active) {
-    //           values.is_active = 0;
-    //         } else {
-    //           values.is_active = 1;
-    //         }
-    //         if (_.isEmpty(values.password)) {
-    //           values = {
-    //             name: values.name,
-    //             email: values.email,
-    //             mobile: values.mobile,
-    //             roles: values.roles,
-    //             is_active: values.is_active,
-    //           };
-    //         }
-    //         res = await usermanager.edit(this.state.editData.id, values);
-    //       } else {
-    //         // 新增
-    //         res = await usermanager.add(values);
-    //       }
-    //       if (res.code) {
-    //         message.error(res.msg);
-    //         return;
-    //       }
-    //       message.success('用户数据保存成功');
-    //       onCancel();
-    //       this.getList();
-    //     }
-    //   });
-    // };
-
-    /**
      * 改变筛选项
      */
     /*
@@ -240,6 +313,39 @@ class Moral extends React.PureComponent<IProps, IState> {
     */
 
     /**
+     * 改变选项卡
+     */
+    const changeTab = (val: string) => {
+      // console.log(val);
+      this.setState({
+        defaultActiveKey: val,
+        page: 1,
+        pageSize: 10,
+      }, () => {
+        this.getDetail();
+      });
+    };
+
+    /**
+     * 文件下载
+     */
+    const download = async (id: number, fileType: string, fileName: string) => {
+      // console.log(id);
+      const res = await files.download(id, {});
+
+      const file = new Blob([res.data], {
+        type: fileType
+      });
+      console.log(res);
+      const a = document.createElement('a');
+      a.download = fileName;
+      a.href = URL.createObjectURL(file);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    };
+
+    /**
      * 改变锁定状态
      */
     const onChange = (checked: boolean, event: Event) => {
@@ -249,25 +355,98 @@ class Moral extends React.PureComponent<IProps, IState> {
         });
       } else {
         // 保存数据
-        this.props.form.validateFields(/*['loginId'],*/ async (err: boolean, values: any) => {
-          if (!err) {
-            values.graduate_time = moment(values.graduate_time).format('YYYY-MM-DD');
-            const res = await progress.addOrEditBaseInfo(values);
-
-            if (res.code) {
-              message.error(res.msg);
-              return;
+        if (this.state.defaultActiveKey === '1') {
+          this.props.form.validateFields(/*['loginId'],*/ async (err: boolean, values: any) => {
+            let params = {
+              category: 'summary',
+              summary: values.summary,
+            };
+            if (!err) {
+              const res = await progress.addOrEditMoral(params);
+              if (res.code) {
+                message.error(res.msg);
+                return;
+              }
+              message.success('师德师风信息保存成功');
+              this.setState({
+                editAble: false,
+              }, () => {
+                this.getDetail();
+              });
             }
-            message.success('基本信息保存成功');
-            this.setState({
-              editAble: false,
-            }, () => {
-              this.getDetail();
-            });
-          }
-        });
-      }
+          });
+        }
+        if (this.state.defaultActiveKey === '2') {
+          this.props.form.validateFields(/*['loginId'],*/ async (err: boolean, values: any) => {
+            let params = {
+              category: 'kaohe',
+              kaohe: values.kaohe,
+            };
+            console.log(this.tableData);
+            for (let i = 1; i < 6; i++) {
+              params['niandu' + i] = this.tableData[i - 1] ? this.tableData[i - 1]['niandu_start'] + '-' + this.tableData[i - 1]['niandu_end'] : '';
+              params['niandu' + i + '_kaohe'] = this.tableData[i - 1] ? this.tableData[i - 1]['kaohe_level'] : '';
+            }
 
+            if (!err) {
+              const res = await progress.addOrEditMoral(params);
+              if (res.code) {
+                message.error(res.msg);
+                return;
+              }
+              message.success('师德师风信息保存成功');
+              this.setState({
+                editAble: false,
+              }, () => {
+                this.getDetail();
+              });
+            }
+          });
+        }
+        if (this.state.defaultActiveKey === '3') {
+          this.props.form.validateFields(/*['loginId'],*/ async (err: boolean, values: any) => {
+            let params = {
+              category: 'warning',
+              warning: values.warning,
+            };
+            if (!err) {
+              const res = await progress.addOrEditMoral(params);
+              if (res.code) {
+                message.error(res.msg);
+                return;
+              }
+              message.success('师德师风信息保存成功');
+              this.setState({
+                editAble: false,
+              }, () => {
+                this.getDetail();
+              });
+            }
+          });
+        }
+
+        if (this.state.defaultActiveKey === '4') {
+          this.props.form.validateFields(/*['loginId'],*/ async (err: boolean, values: any) => {
+            let params = {
+              category: 'punish',
+              punish: values.punish,
+            };
+            if (!err) {
+              const res = await progress.addOrEditMoral(params);
+              if (res.code) {
+                message.error(res.msg);
+                return;
+              }
+              message.success('师德师风信息保存成功');
+              this.setState({
+                editAble: false,
+              }, () => {
+                this.getDetail();
+              });
+            }
+          });
+        }
+      }
     };
 
     return (
@@ -291,399 +470,357 @@ class Moral extends React.PureComponent<IProps, IState> {
         <div className="content">
           <div className="page-content">
             {/* 下面是本页的内容 */}
-
-            <Form className="modal-form" layout="inline" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
-              <Row>
-                <Col span={8}>
-                  <FormItem label="姓名">
-                    {getFieldDecorator('name', {
-                      initialValue: editData ? editData.name : null,
-                      rules: [
-                        { required: true, message: '请输入姓名' }
-                      ],
-                    })(
-                      <Input
-                        disabled={!!editAble ? false : true}
-                      />
-                    )}
-                  </FormItem>
-                </Col>
-                <Col span={8}>
-                  <FormItem label="曾用名">
-                    {getFieldDecorator('old_name', {
-                      initialValue: editData ? editData.old_name : null,
-                      rules: [
-                        { required: true, message: '请输入曾用名' }
-                      ],
-                    })(
-                      <Input
-                        disabled={!!editAble ? false : true}
-                      />
-                    )}
-                  </FormItem>
-                </Col>
-                <Col span={8}>
-                  <FormItem label="民族">
-                    {getFieldDecorator('min_zu', {
-                      initialValue: editData ? editData.min_zu.toString() : null,
-                      rules: [
-                        { required: true, message: '请选择民族' }
-                      ],
-                    })(
-                      // <Checkbox.Group options={getGroupOptions()} />
-                      <Select
-                        // style={{ width: 200 }}
-                        disabled={!!editAble ? false : true}
-                      >
-                        {getOption('min_zu').map((item: any) => (
-                          <Option value={item.value} key={item.value}>{item.label}</Option>
-                        ))}
-                      </Select>
-                    )}
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={8}>
-                  <FormItem label="性别">
-                    {getFieldDecorator('gender', {
-                      initialValue: editData ? editData.gender.toString() : null,
-                      rules: [
-                        { required: true, message: '请选择性别' }
-                      ],
-                    })(
-                      <Select
-                        // style={{ width: 200 }}
-                        disabled={!!editAble ? false : true}
-                      >
-                        {getOption('gender').map((item: any) => (
-                          <Option value={item.value} key={item.value}>{item.label}</Option>
-                        ))}
-                      </Select>
-                    )}
-                  </FormItem>
-                </Col>
-                <Col span={8}>
-                  <FormItem label="身份证号码">
-                    {getFieldDecorator('id_card', {
-                      initialValue: editData ? editData.id_card : null,
-                      rules: [
-                        { required: true, message: '请输入身份证号码' }
-                      ],
-                    })(
-                      <Input
-                        disabled={!!editAble ? false : true}
-                      />
-                    )}
-                  </FormItem>
-                </Col>
-                <Col span={8}>
-                  <FormItem label="工作单位">
-                    {getFieldDecorator('company', {
-                      initialValue: editData ? editData.company : null,
-                      rules: [
-                        { required: true, message: '请输入工作单位' }
-                      ],
-                    })(
-                      <Input
-                        disabled={!!editAble ? false : true}
-                      />
-                    )}
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={8}>
-                  <FormItem label="单位类别">
-                    {getFieldDecorator('company_type', {
-                      initialValue: editData ? editData.company_type.toString() : null,
-                      rules: [
-                        { required: true, message: '请选择单位类别' }
-                      ],
-                    })(
-                      <Select
-                        // style={{ width: 200 }}
-                        disabled={!!editAble ? false : true}
-                      >
-                        {getOption('company_type').map((item: any) => (
-                          <Option value={item.value} key={item.value}>{item.label}</Option>
-                        ))}
-                      </Select>
-                    )}
-                  </FormItem>
-                </Col>
-                <Col span={8}>
-                  <FormItem label="申报系列">
-                    {getFieldDecorator('apply_series', {
-                      initialValue: editData ? editData.apply_series.toString() : null,
-                      rules: [
-                        { required: true, message: '请选择申报系列' }
-                      ],
-                    })(
-                      <Select
-                        // style={{ width: 200 }}
-                        disabled={!!editAble ? false : true}
-                      >
-                        {getOption('series').map((item: any) => (
-                          <Option value={item.value} key={item.value}>{item.label}</Option>
-                        ))}
-                      </Select>
-                    )}
-                  </FormItem>
-                </Col>
-                <Col span={8}>
-                  <FormItem label="申报学科">
-                    {getFieldDecorator('apply_course', {
-                      initialValue: editData ? editData.apply_course.toString() : null,
-                      rules: [
-                        { required: true, message: '请选择申报学科' }
-                      ],
-                    })(
-                      <Select
-                        // style={{ width: 200 }}
-                        disabled={!!editAble ? false : true}
-                      >
-                        {getOption('course').map((item: any) => (
-                          <Option value={item.value} key={item.value}>{item.label}</Option>
-                        ))}
-                      </Select>
-                    )}
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={8}>
-                  <FormItem label="现有职务级别">
-                    {getFieldDecorator('had_position', {
-                      initialValue: editData ? editData.had_position.toString() : null,
-                      rules: [
-                        { required: true, message: '请选择现有职务级别' }
-                      ],
-                    })(
-                      <Select
-                        // style={{ width: 200 }}
-                        disabled={!!editAble ? false : true}
-                      >
-                        {getOption('position').map((item: any) => (
-                          <Option value={item.value} key={item.value}>{item.label}</Option>
-                        ))}
-                      </Select>
-                    )}
-                  </FormItem>
-                </Col>
-                <Col span={8}>
-                  <FormItem label="申报职务级别">
-                    {getFieldDecorator('apply_position', {
-                      initialValue: editData ? editData.apply_position.toString() : null,
-                      rules: [
-                        { required: true, message: '请选择申报职务级别' }
-                      ],
-                    })(
-                      <Select
-                        // style={{ width: 200 }}
-                        disabled={!!editAble ? false : true}
-                      >
-                        {getOption('position').map((item: any) => (
-                          <Option value={item.value} key={item.value}>{item.label}</Option>
-                        ))}
-                      </Select>
-                    )}
-                  </FormItem>
-                </Col>
-                <Col span={8}>
-                  <FormItem label="评审委员会名称">
-                    {getFieldDecorator('review_team_name', {
-                      initialValue: editData ? editData.review_team_name.toString() : null,
-                      rules: [
-                        { required: true, message: '请选择评审委员会' }
-                      ],
-                    })(
-                      <Select
-                        // style={{ width: 200 }}
-                        disabled={!!editAble ? false : true}
-                      >
-                        {getOption('review_team').map((item: any) => (
-                          <Option value={item.value} key={item.value}>{item.label}</Option>
-                        ))}
-                      </Select>
-                    )}
-                  </FormItem>
-                </Col>
-              </Row>
-              {/* <Row>
-                <Col span={8}>
-                  <FormItem label="最后毕业院校">
-                    {getFieldDecorator('graduate_school', {
-                      initialValue: editData ? editData.graduate_school : null,
-                      rules: [
-                        { required: true, message: '请输入姓名' }
-                      ],
-                    })(
-                      <Input
-                        disabled={!!editAble ? false : true}
-                      />
-                    )}
-                  </FormItem>
-                </Col>
-                <Col span={8}>
-                  <FormItem label="最后毕业时间">
-                    {getFieldDecorator('graduate_time', {
-                      initialValue: editData ? moment(editData.graduate_time, 'YYYY-MM-DD') : null,
-                      rules: [
-                        { required: true, message: '请输入最后毕业时间' }
-                      ],
-                    })(
-                      <DatePicker
-                        locale={locale}
-                        format="YYYY-MM-DD"
-                        disabled={editAble ? false : true}
-                      />
-                    )}
-                  </FormItem>
-                </Col>
-                <Col span={8}>
-                  <FormItem label="最高学历">
-                    {getFieldDecorator('education', {
-                      initialValue: editData ? editData.education.toString() : null,
-                      rules: [
-                        { required: true, message: '请选择评审委员会' }
-                      ],
-                    })(
-                      <Select
-                        // style={{ width: 200 }}
-                        disabled={!!editAble ? false : true}
-                      >
-                        {getOption('education').map((item: any) => (
-                          <Option value={item.value} key={item.value}>{item.label}</Option>
-                        ))}
-                      </Select>
-                    )}
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={8}>
-                  <FormItem label="学历证书号">
-                    {getFieldDecorator('education_no', {
-                      initialValue: editData ? editData.education_no : null,
-                      rules: [
-                        { required: true, message: '请输入学历证书号' }
-                      ],
-                    })(
-                      <Input
-                        disabled={!!editAble ? false : true}
-                      />
-                    )}
-                  </FormItem>
-                </Col>
-                <Col span={8}>
-                  <FormItem label="学位证书号">
-                    {getFieldDecorator('degree_no', {
-                      initialValue: editData ? editData.degree_no : null,
-                      rules: [
-                        { required: true, message: '请输入学位证书号' }
-                      ],
-                    })(
-                      <Input
-                        disabled={!!editAble ? false : true}
-                      />
-                    )}
-                  </FormItem>
-                </Col>
-                <Col span={8}>
-                  <FormItem label="专业">
-                    {getFieldDecorator('subject', {
-                      initialValue: editData ? editData.subject : null,
-                      rules: [
-                        { required: true, message: '请输入专业' }
-                      ],
-                    })(
-                      <Input
-                        disabled={!!editAble ? false : true}
-                      />
-                    )}
-                  </FormItem>
-                </Col>
-              </Row> */}
-              {/* <FormItem label="手机">
-                {getFieldDecorator('mobile', {
-                  initialValue: editData ? editData.mobile : null,
-                  rules: [
-                    { required: true, message: '请输入手机号' },
-                    { validator: validateMobile }
-                  ],
-                  validateFirst: true
-                })(
-                  <Input />
-                )}
-              </FormItem> */}
-              {/* <FormItem label="用户角色">
-                {getFieldDecorator('roles', {
-                  initialValue: editData ? editData.roles.map((role: any) => role.name) : [],
-                  rules: [
-                    { required: true, message: '请选择用户角色' }
-                  ],
-                })(
-                  <Select
-                    style={{ width: 200 }}
-                    mode="multiple"
+            <Tabs defaultActiveKey={this.state.defaultActiveKey} type="card" onChange={changeTab}>
+              <TabPane tab="师德师风（一）" key="1" />
+              <TabPane tab="师德师风（二）" key="2" />
+              <TabPane tab="师德师风（三）" key="3" />
+              <TabPane tab="师德师风（四）" key="4" />
+            </Tabs>
+            {this.state.defaultActiveKey === '1' &&
+              <span>
+                <Row>
+                  <Descriptions
+                    title=""
+                    layout="vertical"
+                    bordered={true}
                   >
-                    {getRoleOptions().map((role: any) => (
-                      <Option value={role.value} key={role.value}>{role.label}</Option>
-                    ))}
-                  </Select>
-                )}
-              </FormItem> */}
-              {/* <FormItem label="组织">
-          {getFieldDecorator('domain_id', {
-            initialValue: editData ? editData.domain_id : null,
-            rules: [
-              { required: true, message: '请选择组织' }
-            ],
-          })(
-            // <Radio.Group options={getDomainOptions()} />
-            <Select
-              style={{ width: 200 }}
-              onChange={onChangeDomain}
-              disabled={!!editData}
-            >
-              {getDomainOptions().map((domain: any) => (
-                <Option value={domain.value} key={domain.value}>{domain.label}</Option>
-              ))}
-            </Select>
-          )}
-        </FormItem> */}
-              {/* {editData &&
-          <FormItem label="空间">
-            {getFieldDecorator('group_ids', {
-              initialValue: editData ? editData.group_ids : null,
-              rules: [
-                { required: true, message: '请选择空间' }
-              ],
-            })(
-              // <Checkbox.Group options={getGroupOptions()} />
-              <Select
-                style={{ width: 200 }}
-                mode="multiple"
-              >
-                {this.state.groupOptions.map((group: any) => (
-                  <Option value={group.value} key={group.value}>{group.label}</Option>
-                ))}
-              </Select>
-            )}
-          </FormItem>
-        } */}
-              {/* {editData &&
-                <FormItem label="有效用户">
-                  {getFieldDecorator('is_active', {
-                    valuePropName: 'checked',
-                    initialValue: editData.is_active ? true : false,
-                  })(
-                    <Switch checkedChildren="是" unCheckedChildren="否" />
-                  )}
-                </FormItem>
-              } */}
-            </Form>
+                    <Descriptions.Item label="要求1" span={3}>
+                      <Badge status="processing" text="拥护党的领导，拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导拥护党的领导" />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="师德师风综述" span={3}>
+                      <Form className="modal-form" layout="inline" labelCol={{ span: 0 }} wrapperCol={{ span: 24 }}>
+                        <FormItem label="">
+                          {getFieldDecorator('summary', {
+                            initialValue: editData ? editData.summary : null,
+                            rules: [
+                              // { required: true, message: '请输入师德师风综述' }
+                            ],
+                          })(
+                            <TextArea
+                              disabled={!!editAble ? false : true}
+                              placeholder="请输入师德师风综述"
+                              autoSize={{ minRows: 6, maxRows: 10 }}
+                            />
+                          )}
+                        </FormItem>
+                      </Form>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="上传印证材料" span={3}>
+                      <Upload
+                        disabled={!!editAble ? false : true}
+                        name="file"
+                        action={uploadAttachUrl}
+                        headers={{
+                          'authorization': getToken(),
+                          // 'Content-Type': ContentType.MULTIPART
+                        }}
+                        data={{
+                          bize_type: 'moral/summary',
+                          bize_id: this.state.editData && this.state.editData.id ? this.state.editData.id : '',
+                        }}
+                        showUploadList={false}
+                        onChange={onUplodChange}
+                        multiple={true}
+                        style={{ marginBottom: 5 }}
+                      >
+                        <Button>
+                          <Icon type="upload" />点击上传印证材料
+                        </Button>
+                      </Upload>
+                      {
+                        attachList
+                        && attachList.length > 0
+                        &&
+                        <List
+                          bordered={true}
+                          dataSource={attachList}
+                          style={{ marginTop: 10 }}
+                          renderItem={(item: any) => (
+                            <List.Item>
+                              <Typography.Text>
+                                <Icon type="paper-clip" />
+                              </Typography.Text>
+                              <Button type="link" onClick={download.bind(this, item.id, item.file_type, item.original_name)}>{item.original_name}</Button>
+                              <span style={{ marginLeft: 30 }}>上传日期：{moment(item.created_at).format('YYYY/MM/DD')}</span>
+                              <span style={{ marginLeft: 30 }}>
+                                <Popconfirm title="确认删除吗?" onConfirm={() => del(item)} disabled={!!editAble ? false : true}>
+                                  <Button
+                                    type="danger"
+                                    disabled={!!editAble ? false : true}
+                                  >删除
+                                  </Button>
+                                </Popconfirm>
+                              </span>
+                            </List.Item>
+                          )}
+                        />
+                      }
+                    </Descriptions.Item>
+                  </Descriptions>
+                </Row>
+              </span>
+            }
+            {this.state.defaultActiveKey === '2' &&
+              <span>
+                <Row>
+                  <Descriptions
+                    title=""
+                    layout="vertical"
+                    bordered={true}
+                  >
+                    <Descriptions.Item label="要求2" span={3}>
+                      <Badge status="processing" text="是否有下列情况：（3）事业单位工作人员（企业人员参照执行）收到行政“记过”处分1年、“降低岗位登记或者撤职”处分2年内不得申报；受到“开除”处分5年内不得申报。" />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="本人情况（请填写）：" span={3}>
+                      <Form className="modal-form" layout="inline" labelCol={{ span: 0 }} wrapperCol={{ span: 24 }}>
+                        <FormItem label="">
+                          {getFieldDecorator('kaohe', {
+                            initialValue: editData ? editData.kaohe : null,
+                            rules: [
+                              // { required: true, message: '请输入师德师风综述' }
+                            ],
+                          })(
+                            <TextArea
+                              disabled={!!editAble ? false : true}
+                              placeholder="请输入本人情况"
+                              autoSize={{ minRows: 6, maxRows: 10 }}
+                            />
+                          )}
+                        </FormItem>
+                      </Form>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="近五年度考核" span={3}>
+                      <EditableTable
+                        form={this.props.form}
+                        editAble={this.state.editAble}
+                        editData={this.state.editData}
+                        tablechange={this.changeTableData}
+                        getOptions={getOptions}
+                      />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="上传印证材料" span={3}>
+                      <Upload
+                        disabled={!!editAble ? false : true}
+                        name="file"
+                        action={uploadAttachUrl}
+                        headers={{
+                          'authorization': getToken(),
+                          // 'Content-Type': ContentType.MULTIPART
+                        }}
+                        data={{
+                          bize_type: 'moral/kaohe',
+                          bize_id: this.state.editData && this.state.editData.id ? this.state.editData.id : '',
+                        }}
+                        showUploadList={false}
+                        onChange={onUplodChange}
+                        multiple={true}
+                        style={{ marginBottom: 5 }}
+                      >
+                        <Button>
+                          <Icon type="upload" />点击上传印证材料
+                        </Button>
+                      </Upload>
+                      {
+                        attachList
+                        && attachList.length > 0
+                        &&
+                        <List
+                          bordered={true}
+                          dataSource={attachList}
+                          style={{ marginTop: 10 }}
+                          renderItem={(item: any) => (
+                            <List.Item>
+                              <Typography.Text>
+                                <Icon type="paper-clip" />
+                              </Typography.Text>
+                              <Button type="link" onClick={download.bind(this, item.id, item.file_type, item.original_name)}>{item.original_name}</Button>
+                              <span style={{ marginLeft: 30 }}>上传日期：{moment(item.created_at).format('YYYY/MM/DD')}</span>
+                              <span style={{ marginLeft: 30 }}>
+                                <Popconfirm title="确认删除吗?" onConfirm={() => del(item)} disabled={!!editAble ? false : true}>
+                                  <Button
+                                    type="danger"
+                                    disabled={!!editAble ? false : true}
+                                  >删除
+                                  </Button>
+                                </Popconfirm>
+                              </span>
+                            </List.Item>
+                          )}
+                        />
+                      }
+                    </Descriptions.Item>
+                  </Descriptions>
+                </Row>
+              </span>
+            }
+            {this.state.defaultActiveKey === '3' &&
+              <span>
+                <Row>
+                  <Descriptions
+                    title=""
+                    layout="vertical"
+                    bordered={true}
+                  >
+                    <Descriptions.Item label="要求2" span={3}>
+                      <Badge status="processing" text="是否有下列情况：（2）党员受到党内“警告”处分一年内、“严重警告”处分1.5年内，“撤销党内职务”处分2年内，“留党查看”处分期内及处分期满2年内，“开除党籍”处分5年内不得申报" />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="本人情况（请填写）：" span={3}>
+                      <Form className="modal-form" layout="inline" labelCol={{ span: 0 }} wrapperCol={{ span: 24 }}>
+                        <FormItem label="">
+                          {getFieldDecorator('warning', {
+                            initialValue: editData ? editData.warning : null,
+                            rules: [
+                              // { required: true, message: '请输入师德师风综述' }
+                            ],
+                          })(
+                            <TextArea
+                              disabled={!!editAble ? false : true}
+                              placeholder="请输入本人情况"
+                              autoSize={{ minRows: 6, maxRows: 10 }}
+                            />
+                          )}
+                        </FormItem>
+                      </Form>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="上传印证材料" span={3}>
+                      <Upload
+                        disabled={!!editAble ? false : true}
+                        name="file"
+                        action={uploadAttachUrl}
+                        headers={{
+                          'authorization': getToken(),
+                          // 'Content-Type': ContentType.MULTIPART
+                        }}
+                        data={{
+                          bize_type: 'moral/warning',
+                          bize_id: this.state.editData && this.state.editData.id ? this.state.editData.id : '',
+                        }}
+                        showUploadList={false}
+                        onChange={onUplodChange}
+                        multiple={true}
+                        style={{ marginBottom: 5 }}
+                      >
+                        <Button>
+                          <Icon type="upload" />点击上传印证材料
+                        </Button>
+                      </Upload>
+                      {
+                        attachList
+                        && attachList.length > 0
+                        &&
+                        <List
+                          bordered={true}
+                          dataSource={attachList}
+                          style={{ marginTop: 10 }}
+                          renderItem={(item: any) => (
+                            <List.Item>
+                              <Typography.Text>
+                                <Icon type="paper-clip" />
+                              </Typography.Text>
+                              <Button type="link" onClick={download.bind(this, item.id, item.file_type, item.original_name)}>{item.original_name}</Button>
+                              <span style={{ marginLeft: 30 }}>上传日期：{moment(item.created_at).format('YYYY/MM/DD')}</span>
+                              <span style={{ marginLeft: 30 }}>
+                                <Popconfirm title="确认删除吗?" onConfirm={() => del(item)} disabled={!!editAble ? false : true}>
+                                  <Button
+                                    type="danger"
+                                    disabled={!!editAble ? false : true}
+                                  >删除
+                                  </Button>
+                                </Popconfirm>
+                              </span>
+                            </List.Item>
+                          )}
+                        />
+                      }
+                    </Descriptions.Item>
+                  </Descriptions>
+                </Row>
+              </span>
+            }
+            {this.state.defaultActiveKey === '4' &&
+              <span>
+                <Row>
+                  <Descriptions
+                    title=""
+                    layout="vertical"
+                    bordered={true}
+                  >
+                    <Descriptions.Item label="要求2" span={3}>
+                      <Badge status="processing" text="是否有下列情况：（3）事业单位工作人员（企业人员参照执行）收到行政“记过”处分1年、“降低岗位登记或者撤职”处分2年内不得申报；受到“开除”处分5年内不得申报。" />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="本人情况（请填写）：" span={3}>
+                      <Form className="modal-form" layout="inline" labelCol={{ span: 0 }} wrapperCol={{ span: 24 }}>
+                        <FormItem label="">
+                          {getFieldDecorator('punish', {
+                            initialValue: editData ? editData.punish : null,
+                            rules: [
+                              // { required: true, message: '请输入师德师风综述' }
+                            ],
+                          })(
+                            <TextArea
+                              disabled={!!editAble ? false : true}
+                              placeholder="请输入本人情况"
+                              autoSize={{ minRows: 6, maxRows: 10 }}
+                            />
+                          )}
+                        </FormItem>
+                      </Form>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="上传印证材料" span={3}>
+                      <Upload
+                        disabled={!!editAble ? false : true}
+                        name="file"
+                        action={uploadAttachUrl}
+                        headers={{
+                          'authorization': getToken(),
+                          // 'Content-Type': ContentType.MULTIPART
+                        }}
+                        data={{
+                          bize_type: 'moral/punish',
+                          bize_id: this.state.editData && this.state.editData.id ? this.state.editData.id : '',
+                        }}
+                        showUploadList={false}
+                        onChange={onUplodChange}
+                        multiple={true}
+                        style={{ marginBottom: 5 }}
+                      >
+                        <Button>
+                          <Icon type="upload" />点击上传印证材料
+                        </Button>
+                      </Upload>
+                      {
+                        attachList
+                        && attachList.length > 0
+                        &&
+                        <List
+                          bordered={true}
+                          dataSource={attachList}
+                          style={{ marginTop: 10 }}
+                          renderItem={(item: any) => (
+                            <List.Item>
+                              <Typography.Text>
+                                <Icon type="paper-clip" />
+                              </Typography.Text>
+                              <Button type="link" onClick={download.bind(this, item.id, item.file_type, item.original_name)}>{item.original_name}</Button>
+                              <span style={{ marginLeft: 30 }}>上传日期：{moment(item.created_at).format('YYYY/MM/DD')}</span>
+                              <span style={{ marginLeft: 30 }}>
+                                <Popconfirm title="确认删除吗?" onConfirm={() => del(item)} disabled={!!editAble ? false : true}>
+                                  <Button
+                                    type="danger"
+                                    disabled={!!editAble ? false : true}
+                                  >删除
+                                  </Button>
+                                </Popconfirm>
+                              </span>
+                            </List.Item>
+                          )}
+                        />
+                      }
+                    </Descriptions.Item>
+                  </Descriptions>
+                </Row>
+              </span>
+            }
           </div>
         </div>
       </div >

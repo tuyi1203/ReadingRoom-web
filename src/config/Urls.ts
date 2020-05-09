@@ -8,7 +8,7 @@ enum Urls {
   basicLogin = '/login/basic', // 基础登录地址
   getRoleListUnLogin = '/login/roles', // 不需要token读取角色列表
 
-    // ----------角色管理接口------------
+  // ----------角色管理接口------------
   getRoleList = '/roles', // 取得角色列表
   delRole = '/roles/{id}', // 删除角色
   addRole = '/roles', // 添加角色
@@ -27,7 +27,14 @@ enum Urls {
   // -----------职称填报接口------------
   getBaseInfoDetail = '/progress/baseinfo/detail/', // 获取基本信息
   addOrEditBaseInfo = '/progress/baseinfo/edit/', // 添加或修改基本信息
+  getMoralDetail = '/progress/morals/detail/', // 获取师德师风信息
+  addOrEditMoral = '/progress/morals/edit/', // 添加或修改基本信息
   getDictList = '/progress/dict/', // 获取数据字典列表
+
+  addFile = '/files/', // 上传文件
+  delFile = '/files/{id}/', // 删除文件
+  getFileList = '/files/', // 获取文件列表
+  downloadFile = '/files/download/{id}/' , // 下载文件
 
   register = '/login/register', // 注册
   getDomainListUnLogin = '/login/domains',  // 不需要token读取组织列表
