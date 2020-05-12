@@ -29,6 +29,8 @@ enum Urls {
   addOrEditBaseInfo = '/progress/baseinfo/edit/', // 添加或修改基本信息
   getMoralDetail = '/progress/morals/detail/', // 获取师德师风信息
   addOrEditMoral = '/progress/morals/edit/', // 添加或修改基本信息
+  getQualificationEducationDetail = '/progress/qualification/educate/detail/', // 获取基本资格教育信息
+  addOrEditQualificationEducation = '/progress/qualification/educate/edit/', // 添加或修改基本资格教育信息
   getDictList = '/progress/dict/', // 获取数据字典列表
 
   addFile = '/files/', // 上传文件
