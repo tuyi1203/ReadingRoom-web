@@ -511,7 +511,7 @@ class Moral extends React.PureComponent<IProps, IState> {
                   <Descriptions.Item span={2} label="请填写本人情况:" >
                     <Badge status="processing" text="（1）学历。高级教师一般应具有专科及以上学历。" /></Descriptions.Item>
                   <Descriptions.Item label="最后毕业院校">
-                    <FormItem label="">
+                    <FormItem wrapperCol={{ span: 16 }}>
                       {getFieldDecorator('graduate_school', {
                         initialValue: editData ? editData.graduate_school : null,
                         rules: [
@@ -526,7 +526,7 @@ class Moral extends React.PureComponent<IProps, IState> {
                     </FormItem>
                   </Descriptions.Item>
                   <Descriptions.Item label="最后毕业时间">
-                    <FormItem label="">
+                    <FormItem>
                       {getFieldDecorator('graduate_time', {
                         initialValue: editData && editData.graduate_time ? moment(editData.graduate_time, 'YYYY-MM') : null,
                         rules: [
@@ -544,7 +544,7 @@ class Moral extends React.PureComponent<IProps, IState> {
                     </FormItem>
                   </Descriptions.Item>
                   <Descriptions.Item label="最高学历学位">
-                    <FormItem label="">
+                    <FormItem>
                       {getFieldDecorator('education', {
                         initialValue: editData ? editData.education.toString() : null,
                         rules: [
@@ -563,7 +563,7 @@ class Moral extends React.PureComponent<IProps, IState> {
                     </FormItem>
                   </Descriptions.Item>
                   <Descriptions.Item label="学历证书号">
-                    <FormItem label="">
+                    <FormItem>
                       {getFieldDecorator('education_no', {
                         initialValue: editData ? editData.education_no : null,
                         rules: [
@@ -578,7 +578,7 @@ class Moral extends React.PureComponent<IProps, IState> {
                     </FormItem>
                   </Descriptions.Item>
                   <Descriptions.Item label="学位证书号">
-                    <FormItem label="">
+                    <FormItem wrapperCol={{ span: 16 }}>
                       {getFieldDecorator('degree_no', {
                         initialValue: editData ? editData.degree_no : null,
                         rules: [
@@ -593,7 +593,7 @@ class Moral extends React.PureComponent<IProps, IState> {
                     </FormItem>
                   </Descriptions.Item>
                   <Descriptions.Item label="专业">
-                    <FormItem label="">
+                    <FormItem>
                       {getFieldDecorator('subject', {
                         initialValue: editData ? editData.subject : null,
                         rules: [

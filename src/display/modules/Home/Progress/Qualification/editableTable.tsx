@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Popconfirm, Button, Table } from 'antd';
 import { EditableFormRow } from './editableRow';
 import EditableCell from './editableCell';
-import { DndProvider, DragSource, DropTarget } from 'react-dnd';
+import { DndProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import update from 'immutability-helper';
 
@@ -177,19 +177,44 @@ class EditableTable extends React.PureComponent<IProps, IState> {
         }),
       };
     });
+
+    const moveRow = (dragIndex: any, hoverIndex: any) => {
+      if (!this.props.editAble) {
+        return;
+      }
+      const { dataSource } = this.state;
+      const dragRow = dataSource[dragIndex];
+
+      this.setState(
+        update(this.state, {
+          dataSource: {
+            $splice: [[dragIndex, 1], [hoverIndex, 0, dragRow]],
+          },
+        }), () => {
+          this.props.tablechange(this.state.dataSource);
+        }
+      );
+    };
+
     return (
       <div>
-        <Button onClick={handleAdd} type="primary" style={{ marginBottom: 16 }} disabled={!this.state.editAble || this.state.count > 4}>
-          增加一个年度
+        <Button onClick={handleAdd} type="primary" style={{ marginBottom: 16 }} disabled={!this.state.editAble}>
+          增加教育经历
           </Button>
-        <Table
-          components={components}
-          rowClassName={() => 'editable-row'}
-          bordered={true}
-          dataSource={dataSource}
-          columns={columns}
-          pagination={false}
-        />
+        <DndProvider backend={HTML5Backend}>
+          <Table
+            components={components}
+            rowClassName={() => 'editable-row'}
+            bordered={true}
+            dataSource={dataSource}
+            columns={columns}
+            pagination={false}
+            onRow={(record, index) => ({
+              index,
+              moveRow
+            })}
+          />
+        </DndProvider>
       </div>
     );
   }

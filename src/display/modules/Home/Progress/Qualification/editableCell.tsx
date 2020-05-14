@@ -105,6 +105,38 @@ class EditableCell extends React.PureComponent<IProps, IState> {
     };
 
     /**
+     * 日期选择时的回调
+     */
+    const onDateChange = (date: any, dateString: string) => {
+      const { record, handleSave } = this.props;
+      this.props.form.validateFields(/*['loginId'],*/ async (err: boolean, values: any) => {
+        if (err) {
+          return;
+        }
+        console.log(values);
+        let param = {
+          start: record.start,
+          end: record.end,
+          school_name: record.school_name,
+          prove_person: record.prove_person,
+          key: record.key,
+          education: record.education,
+        };
+
+        if (dataIndex === 'start') {
+          param.start = dateString;
+        }
+
+        if (dataIndex === 'end') {
+          param.end = dateString;
+        }
+
+        handleSave({ ...param });
+        // toggleEdit();
+      });
+    };
+
+    /**
      * 年度改变时的回调
      */
     // const onDateChange = (type: string, value: any) => {
@@ -210,7 +242,7 @@ class EditableCell extends React.PureComponent<IProps, IState> {
                       initialValue: moment(record[dataIndex], 'YYYY-MM'),
                       // initialValue: record[dataIndex],
                     })
-                      (<MonthPicker />)
+                      (<MonthPicker onChange={onDateChange} />)
                   }
                 </Form.Item >
               ))) : (

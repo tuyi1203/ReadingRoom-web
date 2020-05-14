@@ -12,3 +12,26 @@ border: 1px solid #d9d9d9;
 border-radius: 4px;
 padding: 4px 11px;
 }
+
+#components-table-demo-drag-sorting tr.drop-over-downward td {
+  border-bottom: 2px dashed #1890ff;
+}
+
+#components-table-demo-drag-sorting tr.drop-over-upward td {
+  border-top: 2px dashed #1890ff;
+}
+.ant-form-item {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 14px;
+  font-variant: tabular-nums;
+  line-height: 1.5;
+  list-style: none;
+  -webkit-font-feature-settings: 'tnum';
+  font-feature-settings: 'tnum';
+  /* margin-bottom: 24px; */
+  vertical-align: top;
+}
