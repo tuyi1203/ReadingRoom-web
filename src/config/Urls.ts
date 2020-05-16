@@ -31,12 +31,18 @@ enum Urls {
   addOrEditMoral = '/progress/morals/edit/', // 添加或修改基本信息
   getQualificationEducationDetail = '/progress/qualification/educate/detail/', // 获取基本资格教育信息
   addOrEditQualificationEducation = '/progress/qualification/educate/edit/', // 添加或修改基本资格教育信息
+  getQualificationWorkDetail = '/progress/qualification/work/detail/', // 获取基本资格工作信息
+  addOrEditQualificationWork = '/progress/qualification/work/edit/', // 添加或修改基本资格工作信息
+  getQualificationWorkExperienceDetail = '/progress/qualification/work/experience/detail/', // 获取基本资格教育信息
+  addOrEditQualificationWorkExperience = '/progress/qualification/work/experience/edit/', // 添加或修改基本资格教育信息
+  getQualificationManageExperienceDetail = '/progress/qualification/manage/experience/detail/', // 获取基本资格教育信息
+  addOrEditQualificationManageExperience = '/progress/qualification/manage/experience/edit/', // 添加或修改基本资格教育信息
   getDictList = '/progress/dict/', // 获取数据字典列表
 
   addFile = '/files/', // 上传文件
   delFile = '/files/{id}/', // 删除文件
   getFileList = '/files/', // 获取文件列表
-  downloadFile = '/files/download/{id}/' , // 下载文件
+  downloadFile = '/files/download/{id}/', // 下载文件
 
   register = '/login/register', // 注册
   getDomainListUnLogin = '/login/domains',  // 不需要token读取组织列表
@@ -45,7 +51,7 @@ enum Urls {
   editNetElemnt = '/infra/datadict/netelement/{id}/', // 编辑网元数据
   delNetElemnt = '/infra/datadict/netelement/{id}/', // 删除网元数据
   deviceConn = '/infra/netelementmanager/netelement/device_conn/', // 网元连接测试
-  
+
   getUserManagerDomainList = '/usermanager/domains/', // 获取用户组织列表
   addUserManagerDomain = '/usermanager/domains/', // 新建组织
   editUserManagerDomain = '/usermanager/domains/{id}/', // 修改组织

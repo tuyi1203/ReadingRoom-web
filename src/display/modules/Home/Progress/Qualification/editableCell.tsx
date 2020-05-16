@@ -19,6 +19,7 @@ export interface IProps {
   editable: boolean;
   index: number;
   eduoptions: any;
+  activeKey: string;
 }
 
 /** State接口，定义需要用到的State类型，constructor中的state应该和此定义的类型一致 */
@@ -53,6 +54,7 @@ class EditableCell extends React.PureComponent<IProps, IState> {
       index,
       handleSave,
       children,
+      activeKey,
       ...restProps
     } = this.props;
 
@@ -90,14 +92,17 @@ class EditableCell extends React.PureComponent<IProps, IState> {
           return;
         }
         console.log(values);
-        let param = {
-          start: record.start,
-          end: record.end,
-          school_name: record.school_name,
-          prove_person: record.prove_person,
-          key: record.key,
-          education: value,
-        };
+        let param: any = {};
+        if (activeKey === '1') {
+          param = {
+            start: record.start,
+            end: record.end,
+            school_name: record.school_name,
+            prove_person: record.prove_person,
+            key: record.key,
+            education: value,
+          };
+        }
 
         handleSave({ ...param });
         // toggleEdit();
@@ -114,14 +119,34 @@ class EditableCell extends React.PureComponent<IProps, IState> {
           return;
         }
         console.log(values);
-        let param = {
-          start: record.start,
-          end: record.end,
-          school_name: record.school_name,
-          prove_person: record.prove_person,
-          key: record.key,
-          education: record.education,
-        };
+        let param: any = {};
+        if (activeKey === '1') {
+          param = {
+            start: record.start,
+            end: record.end,
+            school_name: record.school_name,
+            prove_person: record.prove_person,
+            key: record.key,
+            education: record.education,
+          };
+        } else if (activeKey === '3') {
+          param = {
+            start: record.start,
+            end: record.end,
+            company: record.company,
+            affairs: record.affairs,
+            prove_person: record.prove_person,
+            key: record.key,
+          };
+        } else if (activeKey === '4') {
+          param = {
+            start: record.start,
+            end: record.end,
+            affairs: record.affairs,
+            prove_person: record.prove_person,
+            key: record.key,
+          };
+        }
 
         if (dataIndex === 'start') {
           param.start = dateString;
@@ -169,6 +194,42 @@ class EditableCell extends React.PureComponent<IProps, IState> {
       const { editing } = this.state;
       console.log(record, dataIndex, children);
       return editing ? (
+        (dataIndex === 'affairs'
+          && (
+            <Form.Item style={{ margin: 0 }}>
+              {getFieldDecorator(dataIndex, {
+                initialValue: record[dataIndex] ? record[dataIndex].toString() : null,
+                rules: [
+                  { required: true, message: `${title}不能为空` }
+                ],
+              })(
+                <Input
+                  onPressEnter={save}
+                  onBlur={save}
+                  placeholder="请输入从事专业或技术工作"
+                />
+              )}
+            </Form.Item>
+          ))
+        ||
+        (dataIndex === 'company'
+          && (
+            <Form.Item style={{ margin: 0 }}>
+              {getFieldDecorator(dataIndex, {
+                initialValue: record[dataIndex] ? record[dataIndex].toString() : null,
+                rules: [
+                  { required: true, message: `${title}不能为空` }
+                ],
+              })(
+                <Input
+                  onPressEnter={save}
+                  onBlur={save}
+                  placeholder="请输入工作单位"
+                />
+              )}
+            </Form.Item>
+          ))
+        ||
         (dataIndex === 'school_name'
           && (
             <Form.Item style={{ margin: 0 }}>
