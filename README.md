@@ -1,4 +1,4 @@
-# react脚手架（TypeScrpit版）
+#脚手架（TypeScrpit版）
 简介：react脚手架（TypeScrpit版），基于create-react-app3.2打造，内部集成typescript，tslint
 框架内部实现路由（react-router-dom）、与后端交互（使用axios）、权限体系（基于token）、redux、数据mock、环境及变量（区分dev，demo，prod环境）、自动生成代码等功能  
 为保证正常使用本脚手架，请确保以下功能正确安装：  
