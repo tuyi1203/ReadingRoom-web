@@ -37,6 +37,11 @@ enum Urls {
   addOrEditQualificationWorkExperience = '/progress/qualification/work/experience/edit/', // 添加或修改基本资格教育信息
   getQualificationManageExperienceDetail = '/progress/qualification/manage/experience/detail/', // 获取基本资格教育信息
   addOrEditQualificationManageExperience = '/progress/qualification/manage/experience/edit/', // 添加或修改基本资格教育信息
+  addResearchAchievement = '/progress/research/achievement', // 添加研究成果数据
+  editResearchAchievement = '/progress/research/achievement/{id}', // 修改研究成果数据
+  getResearchAchievementList = '/progress/research/achievement/', // 获取研究成果列表
+  getResearchAchievementDetail = '/progress/research/achievement/{id}', // 获取研究成果详情
+  delResearchAchievement = '/progress/research/achievement/{id}', // 删除研究成果数据
   getDictList = '/progress/dict/', // 获取数据字典列表
 
   addFile = '/files/', // 上传文件

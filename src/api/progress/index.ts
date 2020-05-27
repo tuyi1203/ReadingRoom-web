@@ -11,6 +11,11 @@ import getQualificationWorkExperienceDetail from './getQualificationWorkExperien
 import addOrEditQualificationWorkExperience from './addOrEditQualificationWorkExperience';
 import getQualificationManageExperienceDetail from './getQualificationManageExperienceDetail';
 import addOrEditQualificationManageExperience from './addOrEditQualificationManageExperience';
+import getResearchAchievementList from './getResearchAchievementList';
+import getResearchAchievementDetail from './getResearchAchievementDetail';
+import addResearchAchievement from './addResearchAchievement';
+import editResearchAchievement from './editResearchAchievementDetail';
+import delResearchAchievement from './delResearchAchievement';
 export default {
   getBaseInfoDetail,
   getDictList,
@@ -25,4 +30,9 @@ export default {
   addOrEditQualificationWorkExperience,
   getQualificationManageExperienceDetail,
   addOrEditQualificationManageExperience,
+  getResearchAchievementList,
+  getResearchAchievementDetail,
+  addResearchAchievement,
+  editResearchAchievement,
+  delResearchAchievement,
 };
