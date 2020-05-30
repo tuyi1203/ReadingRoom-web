@@ -33,12 +33,14 @@ export interface IProps {
   editData?: any;
   defaultActiveKey: string;
   getOption: any;
+  updateFileIds: any;
 }
 
 /** State接口，定义需要用到的State类型，constructor中的state应该和此定义的类型一致 */
 export interface IState {
   awardOrNot: boolean;
-  uploadedFiles: any[];
+  uploadedAttachFiles: any[]; // 上传的业绩文件ID
+  uploadedAwardFiles: any[]; // 上传的奖励列表ID
   attachList: any[]; // 业绩列表
   awardList: any[]; // 奖励列表
 }
@@ -47,14 +49,32 @@ export interface IState {
  * AddModal
  */
 class AddEditModal extends React.PureComponent<IProps, IState> {
+  fileIds: any[];
+
   constructor(props: any) {
     super(props);
     this.state = {
       awardOrNot: this.props.editData && this.props.editData.award ? true : false,
-      uploadedFiles: [], // 已上传文件ID列表
+      uploadedAttachFiles: this.props.editData && this.props.editData.achievement_files
+        ? this.props.editData.achievement_files.map((item: any) => item.id)
+        : [], // 已上传业绩文件ID列表
+      uploadedAwardFiles: this.props.editData && this.props.editData.award_files
+        ? this.props.editData.award_files.map((item: any) => item.id)
+        : [], // 已上传的奖励文件ID列表
       attachList: [], // 业绩列表
       awardList: [], // 奖励列表
     };
+
+    this.fileIds = [];
+
+    if (this.props.editData && this.props.editData.achievement_files) {
+      this.props.editData.achievement_files.map((item: any) => this.fileIds.push(item.id));
+    }
+    if (this.props.editData && this.props.editData.award_files) {
+      this.props.editData.award_files.map((item: any) => this.fileIds.push(item.id));
+    }
+    this.props.updateFileIds(this.fileIds);
+
   }
 
   UNSAFE_componentWillMount() {
@@ -70,11 +90,11 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
    * 取得业绩印证材料列表
    */
   getAttachList = async () => {
-    let params: any = {};
-    params.bize_type = 'research/achievement';
-    params.bize_id = this.props.editData ? this.props.editData.id : null;
+    let params: any = {
+      ids: this.state.uploadedAttachFiles
+    };
 
-    const res = await files.getFileList(params);
+    const res = await files.getFileListByIds(params);
     if (res.code) {
       message.error(res.msg);
       return;
@@ -88,11 +108,11 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
    * 取得获奖印证材料列表
    */
   getAwardList = async () => {
-    let params: any = {};
-    params.bize_type = 'research/award';
-    params.bize_id = this.props.editData ? this.props.editData.id : null;
+    let params: any = {
+      ids: this.state.uploadedAwardFiles
+    };
 
-    const res = await files.getFileList(params);
+    const res = await files.getFileListByIds(params);
     if (res.code) {
       message.error(res.msg);
       return;
@@ -123,6 +143,9 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
       this.setState({
         awardOrNot: checked,
       });
+      if (checked) {
+        this.getAwardList();
+      }
     };
 
     /**
@@ -141,7 +164,7 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
     };
 
     /**
-     * 文件上传
+     * 业绩文件上传
      */
     const onUplodChange = async (info: any) => {
       if (info.file.status !== 'uploading') {
@@ -150,10 +173,12 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
       if (info.file.status === 'done') {
         if (!info.file.response.code) {
           // 如果上传成功
-          const { uploadedFiles } = this.state;
-          uploadedFiles.push(info.file.response.results.data.fileId);
+          const { uploadedAttachFiles } = this.state;
+          uploadedAttachFiles.push(info.file.response.results.data.fileId);
+          this.fileIds = uploadedAttachFiles.concat(this.state.uploadedAwardFiles);
+          this.props.updateFileIds(this.fileIds);
           this.setState({
-            uploadedFiles
+            uploadedAttachFiles
           }, () => {
             this.getAttachList();
           });
@@ -166,7 +191,7 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
     };
 
     /**
-     * 文件上传
+     * 奖励文件上传
      */
     const onUplodAwardChange = async (info: any) => {
       if (info.file.status !== 'uploading') {
@@ -175,10 +200,12 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
       if (info.file.status === 'done') {
         if (!info.file.response.code) {
           // 如果上传成功
-          const { uploadedFiles } = this.state;
-          uploadedFiles.push(info.file.response.results.data.fileId);
+          const { uploadedAwardFiles } = this.state;
+          uploadedAwardFiles.push(info.file.response.results.data.fileId);
+          this.fileIds = uploadedAwardFiles.concat(this.state.uploadedAttachFiles);
+          this.props.updateFileIds(this.fileIds);
           this.setState({
-            uploadedFiles
+            uploadedAwardFiles
           }, () => {
             this.getAwardList();
           });
@@ -219,11 +246,22 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
         return;
       }
       message.success('删除成功');
-      this.getAttachList();
+
+      const { uploadedAwardFiles } = this.state;
+      const fileIds = uploadedAwardFiles.filter((item: any) => item !== record.id);
+
+      this.setState({
+        uploadedAwardFiles: fileIds
+      }, () => {
+        this.getAttachList();
+        this.fileIds = fileIds.concat(this.state.uploadedAttachFiles);
+        this.props.updateFileIds(this.fileIds);
+      });
+
     };
 
     /**
-     * 删除附件
+     * 删除奖励附件
      */
     const delAwardList = async (record: any) => {
       const res = await files.delFile(record.id, {});
@@ -231,8 +269,19 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
         message.error(res.msg);
         return;
       }
+
+      const { uploadedAttachFiles } = this.state;
+      const fileIds = uploadedAttachFiles.filter((item: any) => item !== record.id);
+
       message.success('删除成功');
-      this.getAwardList();
+      this.setState({
+        uploadedAttachFiles: fileIds
+      }, () => {
+        this.getAwardList();
+        this.fileIds = fileIds.concat(this.state.uploadedAwardFiles);
+        this.props.updateFileIds(this.fileIds);
+      });
+
     };
 
     /**
@@ -284,34 +333,9 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
     };
     */
 
-    /**
-     * 组织选中值发生变化时改变相关信息
-     */
-    /*
-    const onChangeDomain = (domainId: number) => {
-      const list: any[] = [];
-      if (groupList && groupList.length > 0) {
-        groupList.forEach((p: any) => {
-          if (domainId === p.domain_id) {
-            list.push({
-              label: p.name,
-              value: p.id
-            });
-          }
-        });
-      }
-      this.setState({
-        groupOptions: list,
-      });
-      this.props.form.setFieldsValue({
-        'group_ids': null,
-      });
-    };
-    */
-
     return (
       <Form className="modal-form" layout="inline" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
-        <Divider>业绩信息</Divider>
+        <Divider>成果信息</Divider>
         <FormItem label="学科领域">
           {getFieldDecorator('course', {
             initialValue: editData ? editData.course.toString() : null,
@@ -417,7 +441,7 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
             </FormItem>
             <FormItem label="本人作用">
               {getFieldDecorator('paper_role', {
-                initialValue: editData ? editData.paper_role : null,
+                initialValue: editData && editData.paper_role ? editData.paper_role.toString() : null,
                 rules: [
                   // { required: true, message: '请选择学科领域' }
                 ],
@@ -529,6 +553,450 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
             </FormItem>
           </span>
         }
+        {defaultActiveKey === '2' &&
+          <span>
+            <FormItem label="课题名称">
+              {getFieldDecorator('subject_title', {
+                initialValue: editData ? editData.subject_title : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="发表刊物名称">
+              {getFieldDecorator('subject_no', {
+                initialValue: editData ? editData.subject_no : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="课题类别">
+              {getFieldDecorator('subject_type', {
+                initialValue: editData && editData.subject_type ? editData.subject_type.toString() : null,
+                rules: [
+                  // { required: true, message: '请选择学科领域' }
+                ],
+              })(
+                <Select
+                  style={{ width: 400 }}
+                >
+                  {getOption('subject_type').map((item: any) => (
+                    <Option value={item.value} key={item.value}>{item.label}</Option>
+                  ))}
+                </Select>
+              )}
+            </FormItem>
+            <FormItem label="课题类别">
+              {getFieldDecorator('subject_level', {
+                initialValue: editData && editData.subject_level ? editData.subject_level.toString() : null,
+                rules: [
+                  // { required: true, message: '请选择学科领域' }
+                ],
+              })(
+                <Select
+                  style={{ width: 400 }}
+                >
+                  {getOption('subject_level').map((item: any) => (
+                    <Option value={item.value} key={item.value}>{item.label}</Option>
+                  ))}
+                </Select>
+              )}
+            </FormItem>
+            <FormItem label="课题负责人">
+              {getFieldDecorator('subject_responseable_man', {
+                initialValue: editData ? editData.subject_responseable_man : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="课题中本人角色">
+              {getFieldDecorator('subject_role', {
+                initialValue: editData ? editData.subject_role : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="课题中本人排名">
+              {getFieldDecorator('subject_self_rank', {
+                initialValue: editData ? editData.subject_self_rank : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="课题经费">
+              {getFieldDecorator('subject_cost', {
+                initialValue: editData ? editData.subject_cost : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="课题状态">
+              {getFieldDecorator('subject_status', {
+                initialValue: editData && editData.subject_status ? editData.subject_status.toString() : null,
+                rules: [
+                  // { required: true, message: '请选择学科领域' }
+                ],
+              })(
+                <Select
+                  style={{ width: 400 }}
+                >
+                  {getOption('subject_status').map((item: any) => (
+                    <Option value={item.value} key={item.value}>{item.label}</Option>
+                  ))}
+                </Select>
+              )}
+            </FormItem>
+            <FormItem label="课题委托单位">
+              {getFieldDecorator('subject_delegate', {
+                initialValue: editData ? editData.subject_delegate : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="课题承担单位">
+              {getFieldDecorator('subject_exec', {
+                initialValue: editData ? editData.subject_exec : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="课题开始月份" style={{ margin: 0 }}>
+              {
+                getFieldDecorator('subject_start_date', {
+                  initialValue: editData && editData.subject_start_date ? moment(editData.subject_start_date, 'YYYY-MM') : null,
+                  // initialValue: record[dataIndex],
+                })
+                  (<MonthPicker />)
+              }
+            </FormItem>
+            <FormItem label="课题结束月份" style={{ margin: 0 }}>
+              {
+                getFieldDecorator('subject_end_date', {
+                  initialValue: editData && editData.subject_end_date ? moment(editData.subject_end_date, 'YYYY-MM') : null,
+                  // initialValue: record[dataIndex],
+                })
+                  (<MonthPicker />)
+              }
+            </FormItem>
+            <FormItem label="印证材料">
+              <Upload
+                name="file"
+                action={uploadAttachUrl}
+                headers={{
+                  'authorization': getToken(),
+                  // 'Content-Type': ContentType.MULTIPART
+                }}
+                data={{
+                  bize_type: 'research/achievement',
+                  bize_id: editData && editData.id ? editData.id : '',
+                }}
+                showUploadList={false}
+                onChange={onUplodChange}
+                multiple={true}
+                style={{ marginBottom: 5 }}
+              >
+                <Button>
+                  <Icon type="upload" />点击上传印证材料
+                </Button>
+              </Upload>
+              {
+                attachList
+                && attachList.length > 0
+                &&
+                <List
+                  bordered={true}
+                  dataSource={attachList}
+                  style={{ marginTop: 10 }}
+                  renderItem={(item: any) => (
+                    <List.Item>
+                      <Typography.Text>
+                        <Icon type="paper-clip" />
+                      </Typography.Text>
+                      <Button type="link" onClick={download.bind(this, item.id, item.file_type, item.original_name)}>{item.original_name}</Button>
+                      <span style={{ marginLeft: 30 }}>上传日期：{moment(item.created_at).format('YYYY/MM/DD')}</span>
+                      <span style={{ marginLeft: 30 }}>
+                        <Popconfirm title="确认删除吗?" onConfirm={() => del(item)}>
+                          <Button type="danger">删除</Button>
+                        </Popconfirm>
+                      </span>
+                    </List.Item>
+                  )}
+                />
+              }
+            </FormItem>
+          </span>
+        }
+        {defaultActiveKey === '3' &&
+          <span>
+            <FormItem label="著作名称">
+              {getFieldDecorator('book_title', {
+                initialValue: editData ? editData.book_title : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="著作类别">
+              {getFieldDecorator('book_type', {
+                initialValue: editData ? editData.book_type : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="出版社名称">
+              {getFieldDecorator('book_publish_company_name', {
+                initialValue: editData ? editData.book_publish_company_name : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="出版号">
+              {getFieldDecorator('book_publish_no', {
+                initialValue: editData ? editData.book_publish_no : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="出版日期" style={{ margin: 0 }}>
+              {
+                getFieldDecorator('book_publish_date', {
+                  initialValue: editData && editData.book_publish_date ? moment(editData.book_publish_date, 'YYYY-MM') : null,
+                  // initialValue: record[dataIndex],
+                })
+                  (<MonthPicker />)
+              }
+            </FormItem>
+            <FormItem label="著作中本人角色">
+              {getFieldDecorator('book_role', {
+                initialValue: editData ? editData.book_role : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="总字数">
+              {getFieldDecorator('book_write_count', {
+                initialValue: editData ? editData.book_write_count : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="作者人数">
+              {getFieldDecorator('book_author_num', {
+                initialValue: editData ? editData.book_author_num : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="本人撰写字数">
+              {getFieldDecorator('book_author_write_count', {
+                initialValue: editData ? editData.book_author_write_count : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="本人排名">
+              {getFieldDecorator('book_author_rank', {
+                initialValue: editData ? editData.book_author_rank : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="印证材料">
+              <Upload
+                name="file"
+                action={uploadAttachUrl}
+                headers={{
+                  'authorization': getToken(),
+                  // 'Content-Type': ContentType.MULTIPART
+                }}
+                data={{
+                  bize_type: 'research/achievement',
+                  bize_id: editData && editData.id ? editData.id : '',
+                }}
+                showUploadList={false}
+                onChange={onUplodChange}
+                multiple={true}
+                style={{ marginBottom: 5 }}
+              >
+                <Button>
+                  <Icon type="upload" />点击上传印证材料
+                </Button>
+              </Upload>
+              {
+                attachList
+                && attachList.length > 0
+                &&
+                <List
+                  bordered={true}
+                  dataSource={attachList}
+                  style={{ marginTop: 10 }}
+                  renderItem={(item: any) => (
+                    <List.Item>
+                      <Typography.Text>
+                        <Icon type="paper-clip" />
+                      </Typography.Text>
+                      <Button type="link" onClick={download.bind(this, item.id, item.file_type, item.original_name)}>{item.original_name}</Button>
+                      <span style={{ marginLeft: 30 }}>上传日期：{moment(item.created_at).format('YYYY/MM/DD')}</span>
+                      <span style={{ marginLeft: 30 }}>
+                        <Popconfirm title="确认删除吗?" onConfirm={() => del(item)}>
+                          <Button type="danger">删除</Button>
+                        </Popconfirm>
+                      </span>
+                    </List.Item>
+                  )}
+                />
+              }
+            </FormItem>
+          </span>
+        }
+        {defaultActiveKey === '4' &&
+          <span>
+            <FormItem label="专利或软件著作权类型">
+              {getFieldDecorator('copyright_type', {
+                initialValue: editData ? editData.copyright_type : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="专利或软件著作权名称">
+              {getFieldDecorator('copyright_title', {
+                initialValue: editData ? editData.copyright_title : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="审批时间" style={{ margin: 0 }}>
+              {
+                getFieldDecorator('copyright_ratification', {
+                  initialValue: editData && editData.copyright_ratification ? moment(editData.copyright_ratification, 'YYYY-MM') : null,
+                  // initialValue: record[dataIndex],
+                })
+                  (<MonthPicker />)
+              }
+            </FormItem>
+            <FormItem label="本人角色">
+              {getFieldDecorator('copyright_role', {
+                initialValue: editData ? editData.copyright_role : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="专利号（登记号）">
+              {getFieldDecorator('copyright_no', {
+                initialValue: editData ? editData.copyright_no : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="印证材料">
+              <Upload
+                name="file"
+                action={uploadAttachUrl}
+                headers={{
+                  'authorization': getToken(),
+                  // 'Content-Type': ContentType.MULTIPART
+                }}
+                data={{
+                  bize_type: 'research/achievement',
+                  bize_id: editData && editData.id ? editData.id : '',
+                }}
+                showUploadList={false}
+                onChange={onUplodChange}
+                multiple={true}
+                style={{ marginBottom: 5 }}
+              >
+                <Button>
+                  <Icon type="upload" />点击上传印证材料
+                </Button>
+              </Upload>
+              {
+                attachList
+                && attachList.length > 0
+                &&
+                <List
+                  bordered={true}
+                  dataSource={attachList}
+                  style={{ marginTop: 10 }}
+                  renderItem={(item: any) => (
+                    <List.Item>
+                      <Typography.Text>
+                        <Icon type="paper-clip" />
+                      </Typography.Text>
+                      <Button type="link" onClick={download.bind(this, item.id, item.file_type, item.original_name)}>{item.original_name}</Button>
+                      <span style={{ marginLeft: 30 }}>上传日期：{moment(item.created_at).format('YYYY/MM/DD')}</span>
+                      <span style={{ marginLeft: 30 }}>
+                        <Popconfirm title="确认删除吗?" onConfirm={() => del(item)}>
+                          <Button type="danger">删除</Button>
+                        </Popconfirm>
+                      </span>
+                    </List.Item>
+                  )}
+                />
+              }
+            </FormItem>
+          </span>
+        }
         {awardOrNot &&
           <span>
             <Divider>获奖情况</Divider>
@@ -573,7 +1041,7 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
             </FormItem>
             <FormItem label="获奖类别">
               {getFieldDecorator('award_type', {
-                initialValue: editData ? editData.award_type : null,
+                initialValue: editData && editData.award_type ? editData.award_type.toString() : null,
                 rules: [
                   // { required: true, message: '请选择学科领域' }
                 ],
@@ -589,7 +1057,7 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
             </FormItem>
             <FormItem label="获奖级别">
               {getFieldDecorator('award_level', {
-                initialValue: editData ? editData.award_level : null,
+                initialValue: editData && editData.award_level ? editData.award_level.toString() : null,
                 rules: [
                   // { required: true, message: '请选择学科领域' }
                 ],

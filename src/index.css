@@ -29,6 +29,12 @@ body {
   margin-left: 20px !important;
 }
 
+/*
+.layout-breadcrumb {
+  position: fixed;
+}
+*/
+
 /* .ant-btn-primary {
   background-color: #365ddb !important;
   border-color: #365ddb !important;

@@ -47,6 +47,7 @@ enum Urls {
   addFile = '/files/', // 上传文件
   delFile = '/files/{id}/', // 删除文件
   getFileList = '/files/', // 获取文件列表
+  getFileListByIds = '/files/ids', // 获取文件列表
   downloadFile = '/files/download/{id}/', // 下载文件
 
   register = '/login/register', // 注册
