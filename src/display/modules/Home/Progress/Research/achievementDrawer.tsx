@@ -11,7 +11,7 @@ export interface IProps {
   drawerData: any;
   onClose: any;
   visible: boolean;
-  achievementType: string;
+  type: string;
   yesOrNoOptions: any;
   getOption: any;
 }
@@ -34,7 +34,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
     const {
       drawerData,
       onClose,
-      achievementType,
+      type,
       yesOrNoOptions,
       getOption,
     } = this.props;
@@ -104,8 +104,16 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
               value={drawerData && drawerData.course && _.find(getOption('course'), ['value', drawerData.course.toString()])?.label}
             />
           </Col>
+          <Col span={6}>
+            <DescriptionItem value="成果类型" />
+          </Col>
+          <Col span={6}>
+            <DescriptionItem
+              value={drawerData && drawerData.achievement_type && _.find(getOption('achievement_type'), ['value', drawerData.achievement_type.toString()])?.label}
+            />
+          </Col>
         </Row>
-        {achievementType === '1' &&
+        {type === '1' &&
           <span>
             <Row style={{ marginBottom: 12 }}>
               <Col span={6}>
@@ -255,7 +263,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
             </Row>
           </span>
         }
-        {achievementType === '2' &&
+        {type === '2' &&
           <span>
             <Row style={{ marginBottom: 12 }}>
               <Col span={6}>
@@ -377,7 +385,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
             </Row>
           </span>
         }
-        {achievementType === '3' &&
+        {type === '3' &&
           <span>
             <Row style={{ marginBottom: 12 }}>
               <Col span={6}>
@@ -471,7 +479,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
             </Row>
           </span>
         }
-        {achievementType === '4' &&
+        {type === '4' &&
           <span>
             <Row style={{ marginBottom: 12 }}>
               <Col span={6}>

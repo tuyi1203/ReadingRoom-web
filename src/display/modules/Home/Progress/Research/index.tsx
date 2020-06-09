@@ -82,7 +82,7 @@ class Research extends React.PureComponent<IProps, IState> {
     const param: any = {
       page: this.state.page,
       page_size: this.state.pageSize,
-      achievement_type: this.state.defaultActiveKey
+      type: this.state.defaultActiveKey
     };
 
     console.log(this.state.filterParam);
@@ -170,6 +170,7 @@ class Research extends React.PureComponent<IProps, IState> {
         'subject_type',
         'subject_status',
         'subject_level',
+        'achievement_type',
       ],
     });
 
@@ -745,7 +746,7 @@ class Research extends React.PureComponent<IProps, IState> {
           let res: any = null;
           let params: any = null;
           params = { ...values };
-          params.achievement_type = this.state.defaultActiveKey;
+          params.type = this.state.defaultActiveKey;
           if (params.award) {
             params.award = 1;
           } else {
@@ -793,21 +794,6 @@ class Research extends React.PureComponent<IProps, IState> {
           }
 
           if (this.state.editData) {
-            // 编辑
-            // if (!values.is_active) {
-            //   values.is_active = 0;
-            // } else {
-            //   values.is_active = 1;
-            // }
-            // if (_.isEmpty(values.password)) {
-            //   values = {
-            //     name: values.name,
-            //     email: values.email,
-            //     mobile: values.mobile,
-            //     roles: values.roles,
-            //     is_active: values.is_active,
-            //   };
-            // }
 
             res = await progress.editResearchAchievement(this.state.editData.id, params);
           } else {
@@ -1131,7 +1117,7 @@ class Research extends React.PureComponent<IProps, IState> {
             drawerData={this.state.achievementDrawerData}
             onClose={(e: any) => { return onDrawerClose(e, true); }}
             visible={this.state.showAchievementDrawer}
-            achievementType={this.state.defaultActiveKey}
+            type={this.state.defaultActiveKey}
             yesOrNoOptions={this.yesOrNoOptions}
             getOption={getOption}
           />

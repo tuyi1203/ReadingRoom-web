@@ -352,6 +352,22 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
             </Select>
           )}
         </FormItem>
+        <FormItem label="成果类型">
+          {getFieldDecorator('achievement_type', {
+            initialValue: editData ? editData.achievement_type.toString() : null,
+            rules: [
+              { required: true, message: '请选择成果类型' }
+            ],
+          })(
+            <Select
+              style={{ width: 400 }}
+            >
+              {getOption('achievement_type').map((item: any) => (
+                <Option value={item.value} key={item.value}>{item.label}</Option>
+              ))}
+            </Select>
+          )}
+        </FormItem>
         <FormItem label="是否获奖">
           {getFieldDecorator('award', {
             valuePropName: 'checked',
