@@ -260,6 +260,8 @@ class Research extends React.PureComponent<IProps, IState> {
         defaultActiveKey: val,
         page: 1,
         pageSize: 10,
+        filterItems: [],
+        filterParam: {},
       }, () => {
         this.getList();
       });

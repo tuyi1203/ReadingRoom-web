@@ -42,6 +42,11 @@ enum Urls {
   getResearchAchievementList = '/progress/research/achievement/', // 获取研究成果列表
   getResearchAchievementDetail = '/progress/research/achievement/{id}', // 获取研究成果详情
   delResearchAchievement = '/progress/research/achievement/{id}', // 删除研究成果数据
+  addTeachAchievement = '/progress/teach/achievement', // 添加教育成果数据
+  editTeachAchievement = '/progress/teach/achievement/{id}', // 修改教育成果数据
+  getTeachAchievementList = '/progress/teach/achievement/', // 获取教育成果列表
+  getTeachAchievementDetail = '/progress/teach/achievement/{id}', // 获取教育成果详情
+  delTeachAchievement = '/progress/teach/achievement/{id}', // 删除教育成果数据
   getDictList = '/progress/dict/', // 获取数据字典列表
 
   addFile = '/files/', // 上传文件
