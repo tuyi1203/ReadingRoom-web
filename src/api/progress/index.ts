@@ -21,6 +21,13 @@ import getTeachAchievementDetail from './getTeachAchievementDetail';
 import addTeachAchievement from './addTeachAchievement';
 import editTeachAchievement from './editTeachAchievementDetail';
 import delTeachAchievement from './delTeachAchievement';
+import addEducateAchievement from './addEducateAchievement';
+import addOrEditEducateBaseInfo from './addOrEditEducateBaseInfo';
+import delEducateAchievement from './delEducateAchievement';
+import editEducateAchievement from './editEducateAchievement';
+import getEducateAchievementDetail from './getEducateAchievementDetail';
+import getEducateAchievementList from './getEducateAchievementList';
+import getEducateBaseInfoDetail from './getEducateBaseInfoDetail';
 export default {
   getBaseInfoDetail,
   getDictList,
@@ -45,4 +52,11 @@ export default {
   addTeachAchievement,
   editTeachAchievement,
   delTeachAchievement,
+  addEducateAchievement,
+  addOrEditEducateBaseInfo,
+  editEducateAchievement,
+  delEducateAchievement,
+  getEducateAchievementDetail,
+  getEducateAchievementList,
+  getEducateBaseInfoDetail,
 };

@@ -5,6 +5,7 @@ import Moral from './Moral';
 import Qualification from './Qualification';
 import Research from './Research';
 import Teach from './Teach';
+import Educate from './Educate';
 
 const routers = [
   <Route key="/baseinfo" path="*/baseinfo" component={BaseInfo} />,
@@ -12,6 +13,7 @@ const routers = [
   <Route key="/qualification" path="*/qualification" component={Qualification} />,
   <Route key="/research" path="*/research" component={Research} />,
   <Route key="/teach" path="*/teach" component={Teach} />,
+  <Route key="/educate" path="*/educate" component={Educate} />,
   // <Route key="/domain" path="*/domain" component={Domain} />,
   // <Route key="/role" path="*/role" component={Role} />,
 ];
