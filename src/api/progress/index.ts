@@ -1,5 +1,10 @@
 import getBaseInfoDetail from './getBaseInfoDetail';
 import getDictList from './getDictList';
+import getDictCategory from './getDictCategory';
+import getDicts from './getDicts';
+import addDictData from './addDictData';
+import editDictData from './editDictData';
+import deleteDictData from './deleteDictData';
 import addOrEditBaseInfo from './addOrEditBaseInfo';
 import getMoralDetail from './getMoralDetail';
 import addOrEditMoral from './addOrEditMoral';
@@ -31,6 +36,11 @@ import getEducateBaseInfoDetail from './getEducateBaseInfoDetail';
 export default {
   getBaseInfoDetail,
   getDictList,
+  getDictCategory,
+  getDicts,
+  addDictData,
+  editDictData,
+  deleteDictData,
   addOrEditBaseInfo,
   getMoralDetail,
   addOrEditMoral,

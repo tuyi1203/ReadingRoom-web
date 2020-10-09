@@ -41,7 +41,7 @@ class MyHeader extends React.PureComponent<IProps, IState> {
   }
 
   UNSAFE_componentWillMount() {
-    // this.getShortcutMenu();
+    this.getShortcutMenu();
   }
 
   /**
@@ -49,16 +49,16 @@ class MyHeader extends React.PureComponent<IProps, IState> {
    */
   getShortcutMenu = async () => {
     const res = await system.getShortcutMenuList();
-    if (res.code && res.results && res.results.index && res.results.index.length > 0) {
+    if (!res.code && res.results && res.results.data && res.results.data.length > 0) {
       // console.log(res.results.index);
       // console.log(this.state.token.pages);
       const indexs: string[] = [];
-      res.results.index.forEach((p: number) => {
-        indexs.push(p.toString());
+      res.results.data.forEach((p: string) => {
+        indexs.push(p);
       });
       // 匹配登录用户已有菜单
-      const shortcutMenus = this.state.token.pages.filter((p: any) => indexs.indexOf(p.id) >= 0);
-      console.log(shortcutMenus);
+      const shortcutMenus = this.state.token.pages.filter((p: any) => indexs.indexOf(p.id.toString()) >= 0);
+      console.log(this.state.token.pages);
       this.setState({
         shortcutPages: shortcutMenus
       });
@@ -93,7 +93,7 @@ class MyHeader extends React.PureComponent<IProps, IState> {
     const delMenu = async (id: number) => {
       // message.info('暂无法删除，等待后端接口');
       const res = await system.delShortcutMenu(id);
-      if (res.code) {
+      if (!res.code) {
         message.success('删除快捷菜单成功');
         window.location.reload();
       } else {
@@ -121,9 +121,9 @@ class MyHeader extends React.PureComponent<IProps, IState> {
         }
       }
       const res = await system.saveShortcutMenu({
-        index: [currentPage.id]
+        menu_id: currentPage.id
       });
-      if (res.code) {
+      if (!res.code) {
         message.success('保存快捷菜单成功');
         window.location.reload();
       } else {

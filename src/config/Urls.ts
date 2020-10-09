@@ -54,7 +54,12 @@ enum Urls {
   delEducateAchievement = '/progress/educate/achievement/{id}', // 删除用户教学成果数据
   getEducateAchievementDetail = '/progress/educate/achievement/{id}', // 获取用户教学成果详情
   addEducateAchievement = '/progress/educate/achievement/', // 新增用户教学成果数据
+  getDictCategory = '/progress/dict_category/', // 根据数据字典类型名称，获取数据字典类型信息
   getDictList = '/progress/dict/', // 获取数据字典列表
+  getDicts = '/progress/dict/search/', // 获取数据字典列表
+  addDictData = '/progress/dict/', // 新增数据字典数据
+  editDictData = '/progress/dict/{id}', // 修改数据字典数据
+  deleteDictData = '/progress/dict/{id}', // 删除数据字典数据
 
   addFile = '/files/', // 上传文件
   delFile = '/files/{id}/', // 删除文件

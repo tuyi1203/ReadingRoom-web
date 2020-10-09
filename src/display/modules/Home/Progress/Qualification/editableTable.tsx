@@ -158,13 +158,13 @@ class EditableTable extends React.PureComponent<IProps, IState> {
         {
           title: '开始日期',
           dataIndex: 'start',
-          width: 100,
+          width: 150,
           editable: this.state.editAble,
         },
         {
           title: '结束日期',
           dataIndex: 'end',
-          width: 100,
+          width: 150,
           editable: this.state.editAble,
         },
         {

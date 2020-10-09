@@ -13,6 +13,7 @@ import {
   Icon,
   Typography,
   Popconfirm,
+  AutoComplete,
 } from 'antd';
 // import CommonUtils from 'src/utils/commonUtils';
 import { files } from 'src/api';
@@ -21,6 +22,7 @@ import moment from 'moment';
 import Urls from 'src/config/Urls';
 import storageUtils from 'src/utils/storageUtils';
 import Constant from 'src/dataModel/Constant';
+import Datadict from 'src/dataModel/DataDic';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -334,7 +336,16 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
                   // { required: true, message: '请输入姓名' }
                 ],
               })(
-                <Input />
+                <AutoComplete
+                  dataSource={Datadict.award_authoriry_organization_options}
+                  filterOption={(inputValue, option) => {
+                    const val = option.props.children?.toString();
+                    if (val) {
+                      return val.indexOf(inputValue.toUpperCase()) !== -1;
+                    }
+                    return false;
+                  }}
+                />
               )}
             </FormItem>
             <FormItem label="授奖国家(地区）">
