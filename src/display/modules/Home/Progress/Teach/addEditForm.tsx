@@ -224,7 +224,7 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
     return (
       <Form className="modal-form" layout="inline" labelCol={{ span: 10 }} wrapperCol={{ span: 14 }}>
         <Divider>成果信息</Divider>
-        <FormItem label="成果类型">
+        {/* <FormItem label="成果类型">
           {getFieldDecorator('achievement_type', {
             initialValue: editData ? editData.achievement_type.toString() : null,
             rules: [
@@ -239,18 +239,73 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
               ))}
             </Select>
           )}
-        </FormItem>
+        </FormItem> */}
         {defaultActiveKey === '1' &&
           <span>
-            <FormItem label="获奖时间" style={{ margin: 0 }}>
+            <FormItem label="奖励类型">
+              {getFieldDecorator('award_type', {
+                initialValue: editData && editData.award_type ? editData.award_type.toString() : null,
+                rules: [
+                  { required: true, message: '请选择奖励类型' }
+                ],
+              })(
+                <Select
+                  style={{ width: 400 }}
+                >
+                  {getOption('award_type', ['027', '028']).map((item: any) => (
+                    <Option value={item.value} key={item.value}>{item.label}</Option>
+                  ))}
+                </Select>
+              )}
+            </FormItem>
+            <FormItem label="指导开始时间" style={{ margin: 0 }}>
               {
-                getFieldDecorator('award_date', {
-                  initialValue: editData && editData.award_date ? moment(editData.award_date, 'YYYY-MM') : null,
+                getFieldDecorator('teacher_guide_date_start', {
+                  initialValue: editData && editData.teacher_guide_date_start ? moment(editData.teacher_guide_date_start, 'YYYY-MM') : null,
                   // initialValue: record[dataIndex],
                 })
                   (<MonthPicker />)
               }
             </FormItem >
+            <FormItem label="指导结束时间" style={{ margin: 0 }}>
+              {
+                getFieldDecorator('teacher_guide_date_end', {
+                  initialValue: editData && editData.teacher_guide_date_end ? moment(editData.teacher_guide_date_end, 'YYYY-MM') : null,
+                  // initialValue: record[dataIndex],
+                })
+                  (<MonthPicker />)
+              }
+            </FormItem >
+            <FormItem label="指导对象姓名">
+              {getFieldDecorator('teacher_guide_name', {
+                initialValue: editData ? editData.teacher_guide_name : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="指导内容">
+              {getFieldDecorator('teacher_guide_content', {
+                initialValue: editData ? editData.teacher_guide_content : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="指导效果及荣誉和备注">
+              {getFieldDecorator('teacher_guide_effect', {
+                initialValue: editData ? editData.teacher_guide_effect : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
             <FormItem label="表彰主体(本人、本人所带班队、本人所带学生)">
               {getFieldDecorator('award_main', {
                 initialValue: editData ? editData.award_main : null,
@@ -271,22 +326,15 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
                 <Input />
               )}
             </FormItem>
-            <FormItem label="获奖类别">
-              {getFieldDecorator('award_type', {
-                initialValue: editData && editData.award_type ? editData.award_type.toString() : null,
-                rules: [
-                  // { required: true, message: '请选择学科领域' }
-                ],
-              })(
-                <Select
-                  style={{ width: 400 }}
-                >
-                  {getOption('award_type').map((item: any) => (
-                    <Option value={item.value} key={item.value}>{item.label}</Option>
-                  ))}
-                </Select>
-              )}
-            </FormItem>
+            <FormItem label="获奖时间" style={{ margin: 0 }}>
+              {
+                getFieldDecorator('award_date', {
+                  initialValue: editData && editData.award_date ? moment(editData.award_date, 'YYYY-MM') : null,
+                  // initialValue: record[dataIndex],
+                })
+                  (<MonthPicker />)
+              }
+            </FormItem >
             <FormItem label="获奖级别">
               {getFieldDecorator('award_level', {
                 initialValue: editData && editData.award_level ? editData.award_level.toString() : null,
@@ -358,6 +406,7 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
                 <Input />
               )}
             </FormItem>
+            
             <FormItem label="印证材料">
               <Upload
                 name="file"

@@ -7,6 +7,7 @@ import Research from './Research';
 import Teach from './Teach';
 import Educate from './Educate';
 import Datadict from './Datadict';
+import Teacher from './Teacher';
 
 const routers = [
   <Route key="/baseinfo" path="*/baseinfo" component={BaseInfo} />,
@@ -16,6 +17,7 @@ const routers = [
   <Route key="/teach" path="*/teach" component={Teach} />,
   <Route key="/educate" path="*/educate" component={Educate} />,
   <Route key="/dict" path="*/dict" component={Datadict} />,
+  <Route key="/teacher" path="*/teacher" component={Teacher} />,
   // <Route key="/domain" path="*/domain" component={Domain} />,
   // <Route key="/role" path="*/role" component={Role} />,
 ];

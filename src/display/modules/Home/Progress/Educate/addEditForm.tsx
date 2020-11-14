@@ -224,24 +224,25 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
     return (
       <Form className="modal-form" layout="inline" labelCol={{ span: 10 }} wrapperCol={{ span: 14 }}>
         <Divider>成果信息</Divider>
-        <FormItem label="成果类型">
-          {getFieldDecorator('achievement_type', {
-            initialValue: editData ? editData.achievement_type.toString() : null,
-            rules: [
-              { required: true, message: '请选择成果类型' }
-            ],
-          })(
-            <Select
-              style={{ width: 400 }}
-            >
-              {getOption('achievement_type').map((item: any) => (
-                <Option value={item.value} key={item.value}>{item.label}</Option>
-              ))}
-            </Select>
-          )}
-        </FormItem>
         {defaultActiveKey === '2' &&
           <span>
+            <FormItem label="奖励类型">
+              {getFieldDecorator('award_type', {
+                initialValue: editData && editData.award_type ? editData.award_type.toString() : null,
+                rules: [
+                  { required: true, message: '请选择奖励类型' }
+                ],
+              })(
+                <Select
+                  style={{ width: 400 }}
+                >
+                  {getOption('award_type', ['022', '023', '024', '025']).map((item: any) => (
+                    <Option value={item.value} key={item.value}>{item.label}</Option>
+                  ))}
+                </Select>
+              )}
+            </FormItem>
+
             <FormItem label="获奖时间" style={{ margin: 0 }}>
               {
                 getFieldDecorator('award_date', {
@@ -372,6 +373,22 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
         }
         {defaultActiveKey === '3' &&
           <span>
+            <FormItem label="成果类型">
+              {getFieldDecorator('achievement_type', {
+                initialValue: editData ? editData.achievement_type.toString() : null,
+                rules: [
+                  { required: true, message: '请选择成果类型' }
+                ],
+              })(
+                <Select
+                  style={{ width: 400 }}
+                >
+                  {getOption('achievement_type', ['051', '052']).map((item: any) => (
+                    <Option value={item.value} key={item.value}>{item.label}</Option>
+                  ))}
+                </Select>
+              )}
+            </FormItem>
             <FormItem label="讲座、示范课时间" style={{ margin: 0 }}>
               {
                 getFieldDecorator('lecture_date', {
@@ -383,7 +400,7 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
             </FormItem >
             <FormItem label="讲座内容">
               {getFieldDecorator('lecture_content', {
-                initialValue: editData ? editData.lecture_content : null,
+                initialValue: editData ? editData.lecture_content.toString() : null,
                 rules: [
                   // { required: true, message: '请输入姓名' }
                 ],
@@ -401,6 +418,22 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
                 <Input />
               )}
             </FormItem>
+            <FormItem label="发表范围">
+              {getFieldDecorator('lecture_scope', {
+                initialValue: editData ? editData.lecture_scope.toString() : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Select
+                  style={{ width: 400 }}
+                >
+                  {getOption('award_level').map((item: any) => (
+                    <Option value={item.value} key={item.value}>{item.label}</Option>
+                  ))}
+                </Select>
+              )}
+            </FormItem>
             <FormItem label="主办单位">
               {getFieldDecorator('lecture_organization', {
                 initialValue: editData ? editData.lecture_organization : null,
@@ -411,6 +444,221 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
                 <Input />
               )}
             </FormItem>
+            <FormItem label="印证材料">
+              <Upload
+                name="file"
+                action={uploadAttachUrl}
+                headers={{
+                  'authorization': getToken(),
+                  // 'Content-Type': ContentType.MULTIPART
+                }}
+                data={{
+                  bize_type: 'educate/achievement',
+                  bize_id: editData && editData.id ? editData.id : '',
+                }}
+                showUploadList={false}
+                onChange={onUplodChange}
+                multiple={true}
+                style={{ marginBottom: 5 }}
+              >
+                <Button>
+                  <Icon type="upload" />点击上传印证材料
+                </Button>
+              </Upload>
+              {
+                attachList
+                && attachList.length > 0
+                &&
+                <List
+                  bordered={true}
+                  dataSource={attachList}
+                  style={{ marginTop: 10 }}
+                  renderItem={(item: any) => (
+                    <List.Item>
+                      <Typography.Text>
+                        <Icon type="paper-clip" />
+                      </Typography.Text>
+                      <Button type="link" onClick={download.bind(this, item.id, item.file_type, item.original_name)}>{item.original_name}</Button>
+                      <span style={{ marginLeft: 30 }}>上传日期：{moment(item.created_at).format('YYYY/MM/DD')}</span>
+                      <span style={{ marginLeft: 30 }}>
+                        <Popconfirm title="确认删除吗?" onConfirm={() => del(item)}>
+                          <Button type="danger">删除</Button>
+                        </Popconfirm>
+                      </span>
+                    </List.Item>
+                  )}
+                />
+              }
+            </FormItem>
+          </span>
+        }
+        {defaultActiveKey === '4' &&
+          <span>
+            <FormItem label="奖励类型">
+              {getFieldDecorator('award_type', {
+                initialValue: editData && editData.award_type ? editData.award_type.toString() : null,
+                rules: [
+                  { required: true, message: '请选择奖励类型' }
+                ],
+              })(
+                <Select
+                  style={{ width: 400 }}
+                >
+                  {getOption('award_type', ['027', '028']).map((item: any) => (
+                    <Option value={item.value} key={item.value}>{item.label}</Option>
+                  ))}
+                </Select>
+              )}
+            </FormItem>
+            <FormItem label="指导开始时间" style={{ margin: 0 }}>
+              {
+                getFieldDecorator('teacher_guide_date_start', {
+                  initialValue: editData && editData.teacher_guide_date_start ? moment(editData.teacher_guide_date_start, 'YYYY-MM') : null,
+                  // initialValue: record[dataIndex],
+                })
+                  (<MonthPicker />)
+              }
+            </FormItem >
+            <FormItem label="指导结束时间" style={{ margin: 0 }}>
+              {
+                getFieldDecorator('teacher_guide_date_end', {
+                  initialValue: editData && editData.teacher_guide_date_end ? moment(editData.teacher_guide_date_end, 'YYYY-MM') : null,
+                  // initialValue: record[dataIndex],
+                })
+                  (<MonthPicker />)
+              }
+            </FormItem >
+            <FormItem label="指导对象姓名">
+              {getFieldDecorator('teacher_guide_name', {
+                initialValue: editData ? editData.teacher_guide_name : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="指导内容">
+              {getFieldDecorator('teacher_guide_content', {
+                initialValue: editData ? editData.teacher_guide_content : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="指导效果及荣誉和备注">
+              {getFieldDecorator('teacher_guide_effect', {
+                initialValue: editData ? editData.teacher_guide_effect : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="表彰主体(本人、本人所带班队、本人所带学生)">
+              {getFieldDecorator('award_main', {
+                initialValue: editData ? editData.award_main : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="表彰奖励内容">
+              {getFieldDecorator('award_title', {
+                initialValue: editData ? editData.award_title : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="获奖时间" style={{ margin: 0 }}>
+              {
+                getFieldDecorator('award_date', {
+                  initialValue: editData && editData.award_date ? moment(editData.award_date, 'YYYY-MM') : null,
+                  // initialValue: record[dataIndex],
+                })
+                  (<MonthPicker />)
+              }
+            </FormItem >
+            <FormItem label="获奖级别">
+              {getFieldDecorator('award_level', {
+                initialValue: editData && editData.award_level ? editData.award_level.toString() : null,
+                rules: [
+                  // { required: true, message: '请选择学科领域' }
+                ],
+              })(
+                <Select
+                  style={{ width: 400 }}
+                >
+                  {getOption('award_level').map((item: any) => (
+                    <Option value={item.value} key={item.value}>{item.label}</Option>
+                  ))}
+                </Select>
+              )}
+            </FormItem>
+            <FormItem label="获奖等次">
+              {getFieldDecorator('award_position', {
+                initialValue: editData && editData.award_position ? editData.award_position.toString() : null,
+                rules: [
+                  // { required: true, message: '请选择学科领域' }
+                ],
+              })(
+                <Select
+                  style={{ width: 400 }}
+                >
+                  {getOption('award_position').map((item: any) => (
+                    <Option value={item.value} key={item.value}>{item.label}</Option>
+                  ))}
+                </Select>
+              )}
+            </FormItem>
+            <FormItem label="本人作用">
+              {getFieldDecorator('award_role', {
+                initialValue: editData ? editData.award_role : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+            <FormItem label="授奖单位">
+              {getFieldDecorator('award_authoriry_organization', {
+                initialValue: editData ? editData.award_authoriry_organization : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <AutoComplete
+                  dataSource={Datadict.award_authoriry_organization_options}
+                  filterOption={(inputValue, option) => {
+                    const val = option.props.children?.toString();
+                    if (val) {
+                      return val.indexOf(inputValue.toUpperCase()) !== -1;
+                    }
+                    return false;
+                  }}
+                />
+              )}
+            </FormItem>
+            <FormItem label="授奖国家(地区）">
+              {getFieldDecorator('award_authoriry_country', {
+                initialValue: editData ? editData.award_authoriry_country : null,
+                rules: [
+                  // { required: true, message: '请输入姓名' }
+                ],
+              })(
+                <Input />
+              )}
+            </FormItem>
+
             <FormItem label="印证材料">
               <Upload
                 name="file"

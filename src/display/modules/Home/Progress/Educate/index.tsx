@@ -354,17 +354,27 @@ class Educate extends React.PureComponent<IProps, IState> {
     /*
      * 获取数据字典中某个类别的列表
      */
-    const getOption = (keyName: string): any[] => {
+    const getOption = (keyName: string, range?: any): any[] => {
       const list: any[] = [];
       if (!_.isEmpty(dictList)) {
         const data = dictList[keyName];
         console.log(data);
 
         data.map((item: any) => {
-          list.push({
-            value: item.dict_value,
-            label: item.dict_name,
-          });
+          if (range) {
+            if (range.find((i: any) => i === item.dict_value)) {
+              list.push({
+                value: item.dict_value,
+                label: item.dict_name,
+              });
+            }
+          } else {
+            list.push({
+              value: item.dict_value,
+              label: item.dict_name,
+            });
+          }
+
         });
       }
       return list;
@@ -403,14 +413,14 @@ class Educate extends React.PureComponent<IProps, IState> {
       column = [
         {
           title: '成果类型',
-          key: 'achievement_type',
-          dataIndex: 'achievement_type',
+          key: 'award_type',
+          dataIndex: 'award_type',
           width: 200,
           render: (text: any, record: any) => {
-            console.log(getOption('achievement_type'));
+            console.log(getOption('award_type'));
             return (
               <span>
-                {text && _.find(getOption('achievement_type'), ['value', text.toString()])?.label}
+                {text && _.find(getOption('award_type'), ['value', text.toString()])?.label}
               </span>
             );
           }
@@ -553,6 +563,102 @@ class Educate extends React.PureComponent<IProps, IState> {
       ];
     }
 
+    if (this.state.defaultActiveKey === '4') {
+      column = [
+        {
+          title: '奖励类型',
+          key: 'award_type',
+          dataIndex: 'award_type',
+          width: 200,
+          render: (text: any, record: any) => {
+            console.log(getOption('award_type'));
+            return (
+              <span>
+                {text && _.find(getOption('award_type'), ['value', text.toString()])?.label}
+              </span>
+            );
+          }
+        },
+        {
+          title: '表彰奖励内容',
+          key: 'award_title',
+          dataIndex: 'award_title',
+          width: 200,
+          render: (text: any, record: any) => {
+            return (<span><a onClick={() => showDrawer(record, true)}>{text}</a></span>);
+          }
+        },
+        {
+          title: '指导对象',
+          key: 'teacher_guide_name',
+          dataIndex: 'teacher_guide_name',
+          width: 200,
+        },
+        {
+          title: '指导内容',
+          key: 'teacher_guide_content',
+          dataIndex: 'teacher_guide_content',
+          width: 200,
+        },
+        {
+          title: '获奖级别',
+          key: 'award_level',
+          dataIndex: 'award_level',
+          width: 200,
+          render: (text: any, record: any) => {
+            return (
+              <span>
+                {text && _.find(getOption('award_level'), ['value', text.toString()])?.label}
+              </span>
+            );
+          }
+        },
+        {
+          title: '获奖等次',
+          key: 'award_position',
+          dataIndex: 'award_position',
+          width: 200,
+          render: (text: any, record: any) => {
+            return (
+              <span>
+                {text && _.find(getOption('award_position'), ['value', text.toString()])?.label}
+              </span>
+            );
+          }
+        },
+        {
+          title: '获奖时间',
+          key: 'award_date',
+          dataIndex: 'award_date',
+          width: 200,
+          render: (text: any, record: any) => {
+            return (
+              <span>
+                {text && moment(text).format('YYYY-MM')}
+              </span>
+            );
+          }
+        },
+        {
+          title: '',
+          key: 'action',
+          dataIndex: 'action',
+          width: 200,
+          render: (text: any, record: any) => {
+            return (
+              <div>
+                <Button type="primary" onClick={() => showEdit(record)}>编辑</Button>
+                <Divider type="vertical" />
+                <Popconfirm title="确认删除吗?" onConfirm={() => del(record)}>
+                  <Button type="danger">删除</Button>
+                </Popconfirm>
+              </div>
+            );
+          }
+        },
+      ];
+    }
+
     /*
     * 显示添加
     */
@@ -599,6 +705,18 @@ class Educate extends React.PureComponent<IProps, IState> {
 
           }
 
+          if (this.state.defaultActiveKey === '4') {
+            if (params.award_date) {
+              params.award_date = moment(params.award_date).format('YYYY-MM') + '-' + '01';
+            }
+            if (params.teacher_guide_date_start) {
+              params.teacher_guide_date_start = moment(params.teacher_guide_date_start).format('YYYY-MM') + '-' + '01';
+            }
+            if (params.teacher_guide_date_end) {
+              params.teacher_guide_date_end = moment(params.teacher_guide_date_end).format('YYYY-MM') + '-' + '01';
+            }
+          }
+
           if (this.state.editData) {
 
             res = await progress.editEducateAchievement(this.state.editData.id, params);
@@ -621,7 +739,17 @@ class Educate extends React.PureComponent<IProps, IState> {
      * 提交查询
      */
     const onSearch = () => {
-      this.props.form.validateFields(['award_date_from', 'award_date_to', 'award_title', 'award_authoriry_organization', 'lecture_date_from', 'lecture_date_to', 'teacher_guide_name', 'lecture_content', 'lecture_organization'], async (err: boolean, values: any) => {
+      this.props.form.validateFields([
+        'award_date_from',
+        'award_date_to',
+        'award_title',
+        'award_authoriry_organization',
+        'lecture_date_from',
+        'lecture_date_to',
+        'teacher_guide_name',
+        'lecture_content',
+        'lecture_organization'
+      ], async (err: boolean, values: any) => {
         if (!err) {
           this.setState({
             filterParam: values
@@ -761,6 +889,16 @@ class Educate extends React.PureComponent<IProps, IState> {
                 <Option value={'lecture_organization'}>主办单位</Option>
               </Select>
             }
+            {
+              this.state.defaultActiveKey === '4'
+              &&
+              <Select mode="multiple" placeholder="请选择筛选条件" className="filter-select" onChange={changeFilter}>
+                <Option value={'award_date_from'}>获奖时间（开始）</Option>
+                <Option value={'award_date_to'}>获奖时间（结束）</Option>
+                <Option value={'award_title'}>表彰奖励内容</Option>
+                <Option value={'award_authoriry_organization'}>授奖单位</Option>
+              </Select>
+            }
           </div>
         </div>
         <div className="content">
@@ -810,7 +948,7 @@ class Educate extends React.PureComponent<IProps, IState> {
                       )}
                     </Form.Item>
                   }
-                    {this.state.filterItems.indexOf('lecture_date_from') >= 0 &&
+                  {this.state.filterItems.indexOf('lecture_date_from') >= 0 &&
                     <Form.Item label="讲座、示范课时间（开始）" style={{ margin: 0 }}>
                       {
                         getFieldDecorator('lecture_date_from', {
@@ -865,6 +1003,7 @@ class Educate extends React.PureComponent<IProps, IState> {
               <TabPane tab="业绩基本情况" key="1" />
               <TabPane tab="现场课/录像课/微课/课件/基本功" key="2" />
               <TabPane tab="讲座/示范课" key="3" />
+              <TabPane tab="指导参赛奖" key="4" />
             </Tabs>
             {this.state.defaultActiveKey === '1' &&
               <span>

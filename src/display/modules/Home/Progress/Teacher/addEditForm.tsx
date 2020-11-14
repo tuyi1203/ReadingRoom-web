@@ -352,7 +352,22 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
             </Select>
           )}
         </FormItem>
-
+        <FormItem label="成果类型">
+          {getFieldDecorator('achievement_type', {
+            initialValue: editData ? editData.achievement_type.toString() : null,
+            rules: [
+              { required: true, message: '请选择成果类型' }
+            ],
+          })(
+            <Select
+              style={{ width: 400 }}
+            >
+              {getOption('achievement_type').map((item: any) => (
+                <Option value={item.value} key={item.value}>{item.label}</Option>
+              ))}
+            </Select>
+          )}
+        </FormItem>
         <FormItem label="是否获奖">
           {getFieldDecorator('award', {
             valuePropName: 'checked',
@@ -363,23 +378,7 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
         </FormItem>
         {defaultActiveKey === '1' &&
           <span>
-            <FormItem label="成果类型">
-              {getFieldDecorator('achievement_type', {
-                initialValue: editData ? editData.achievement_type.toString() : null,
-                rules: [
-                  { required: true, message: '请选择成果类型' }
-                ],
-              })(
-                <Select
-                  style={{ width: 400 }}
-                >
-                  {getOption('achievement_type', ['041', '043', '044', '045']).map((item: any) => (
-                    <Option value={item.value} key={item.value}>{item.label}</Option>
-                  ))}
-                </Select>
-              )}
-            </FormItem>
-            <FormItem label="著述名称">
+            <FormItem label="论文名称">
               {getFieldDecorator('paper_title', {
                 initialValue: editData ? editData.paper_title : null,
                 rules: [
@@ -512,7 +511,7 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
                 <Input />
               )}
             </FormItem>
-            <FormItem label="著述收录情况">
+            <FormItem label="论文收录情况">
               {getFieldDecorator('paper_quote', {
                 initialValue: editData ? editData.paper_quote : null,
                 rules: [
@@ -572,22 +571,6 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
         }
         {defaultActiveKey === '2' &&
           <span>
-            <FormItem label="成果类型">
-              {getFieldDecorator('achievement_type', {
-                initialValue: editData ? editData.achievement_type.toString() : null,
-                rules: [
-                  { required: true, message: '请选择成果类型' }
-                ],
-              })(
-                <Select
-                  style={{ width: 400 }}
-                >
-                  {getOption('achievement_type', ['031', '032']).map((item: any) => (
-                    <Option value={item.value} key={item.value}>{item.label}</Option>
-                  ))}
-                </Select>
-              )}
-            </FormItem>
             <FormItem label="课题名称">
               {getFieldDecorator('subject_title', {
                 initialValue: editData ? editData.subject_title : null,
@@ -784,22 +767,6 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
         }
         {defaultActiveKey === '3' &&
           <span>
-            <FormItem label="成果类型">
-              {getFieldDecorator('achievement_type', {
-                initialValue: editData ? editData.achievement_type.toString() : null,
-                rules: [
-                  { required: true, message: '请选择成果类型' }
-                ],
-              })(
-                <Select
-                  style={{ width: 400 }}
-                >
-                  {getOption('achievement_type', ['042']).map((item: any) => (
-                    <Option value={item.value} key={item.value}>{item.label}</Option>
-                  ))}
-                </Select>
-              )}
-            </FormItem>
             <FormItem label="著作名称">
               {getFieldDecorator('book_title', {
                 initialValue: editData ? editData.book_title : null,
@@ -1088,42 +1055,22 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
                 <Input />
               )}
             </FormItem>
-            {(defaultActiveKey === '1' || defaultActiveKey === '3')
-              && <FormItem label="获奖类别">
-                {getFieldDecorator('award_type', {
-                  initialValue: editData && editData.award_type ? editData.award_type.toString() : null,
-                  rules: [
-                    // { required: true, message: '请选择学科领域' }
-                  ],
-                })(
-                  <Select
-                    style={{ width: 400 }}
-                  >
-                    {getOption('award_type', ['021']).map((item: any) => (
-                      <Option value={item.value} key={item.value}>{item.label}</Option>
-                    ))}
-                  </Select>
-                )}
-              </FormItem>
-            }
-            {defaultActiveKey === '2'
-              && <FormItem label="获奖类别">
-                {getFieldDecorator('award_type', {
-                  initialValue: editData && editData.award_type ? editData.award_type.toString() : null,
-                  rules: [
-                    // { required: true, message: '请选择学科领域' }
-                  ],
-                })(
-                  <Select
-                    style={{ width: 400 }}
-                  >
-                    {getOption('award_type', ['047']).map((item: any) => (
-                      <Option value={item.value} key={item.value}>{item.label}</Option>
-                    ))}
-                  </Select>
-                )}
-              </FormItem>
-            }
+            <FormItem label="获奖类别">
+              {getFieldDecorator('award_type', {
+                initialValue: editData && editData.award_type ? editData.award_type.toString() : null,
+                rules: [
+                  // { required: true, message: '请选择学科领域' }
+                ],
+              })(
+                <Select
+                  style={{ width: 400 }}
+                >
+                  {getOption('award_type').map((item: any) => (
+                    <Option value={item.value} key={item.value}>{item.label}</Option>
+                  ))}
+                </Select>
+              )}
+            </FormItem>
             <FormItem label="获奖级别">
               {getFieldDecorator('award_level', {
                 initialValue: editData && editData.award_level ? editData.award_level.toString() : null,
@@ -1147,13 +1094,7 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
                   // { required: true, message: '请输入姓名' }
                 ],
               })(
-                <Select
-                  style={{ width: 400 }}
-                >
-                  {getOption('award_position').map((item: any) => (
-                    <Option value={item.value} key={item.value}>{item.label}</Option>
-                  ))}
-                </Select>
+                <Input />
               )}
             </FormItem>
             <FormItem label="本人排名">

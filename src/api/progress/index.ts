@@ -33,6 +33,12 @@ import editEducateAchievement from './editEducateAchievement';
 import getEducateAchievementDetail from './getEducateAchievementDetail';
 import getEducateAchievementList from './getEducateAchievementList';
 import getEducateBaseInfoDetail from './getEducateBaseInfoDetail';
+import getTeacherBaseinfoList from './getTeacherBaseinfoList';
+import getTeacherBaseInfoDetail from './getTeacherBaseInfoDetail';
+import getTeacherTeachDetail from './getTeacherTeachDetail';
+import getTeacherEducateDetail from './getTeacherEducateDetail';
+import getTeacherResearchDetail from './getTeacherResearchDetail';
+import getTeacherPDF from './getTeacherPDF';
 export default {
   getBaseInfoDetail,
   getDictList,
@@ -69,4 +75,10 @@ export default {
   getEducateAchievementDetail,
   getEducateAchievementList,
   getEducateBaseInfoDetail,
+  getTeacherBaseinfoList,
+  getTeacherBaseInfoDetail,
+  getTeacherTeachDetail,
+  getTeacherEducateDetail,
+  getTeacherResearchDetail,
+  getTeacherPDF,
 };

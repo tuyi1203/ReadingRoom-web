@@ -14,12 +14,12 @@ import {
   Switch,
   Select,
   Input,
-  // DatePicker,
+  DatePicker,
   // Tag
 } from 'antd';
 import CommonButton from 'src/display/components/CommonButton';
 import CurrentPage from 'src/display/components/CurrentPage';
-// import locale from 'antd/es/date-picker/locale/zh_CN';
+import locale from 'antd/es/date-picker/locale/zh_CN';
 
 moment.locale('zh-cn');
 const { Option } = Select;
@@ -112,6 +112,7 @@ class BaseInfo extends React.PureComponent<IProps, IState> {
         'position',
         'review_team',
         'education',
+        'campus',
       ],
     });
 
@@ -135,6 +136,14 @@ class BaseInfo extends React.PureComponent<IProps, IState> {
     } = this.state;
 
     const { getFieldDecorator } = this.props.form;
+
+    /*
+    * 是否选项
+    */
+    const boolList = [
+      { value: 0, label: '否' },
+      { value: 1, label: '是' },
+    ];
 
     /*
      * 获取数据字典中某个类别的列表
@@ -252,6 +261,7 @@ class BaseInfo extends React.PureComponent<IProps, IState> {
         this.props.form.validateFields(/*['loginId'],*/ async (err: boolean, values: any) => {
           if (!err) {
             values.graduate_time = moment(values.graduate_time).format('YYYY-MM-DD');
+            values.birthday = moment(values.birthday).format('YYYY-MM-DD');
             const res = await progress.addOrEditBaseInfo(values);
 
             if (res.code) {
@@ -294,7 +304,7 @@ class BaseInfo extends React.PureComponent<IProps, IState> {
 
             <Form className="modal-form" layout="inline" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
               <Row>
-                <Col span={8}>
+                <Col span={6}>
                   <FormItem label="姓名">
                     {getFieldDecorator('name', {
                       initialValue: editData ? editData.name : null,
@@ -308,7 +318,7 @@ class BaseInfo extends React.PureComponent<IProps, IState> {
                     )}
                   </FormItem>
                 </Col>
-                <Col span={8}>
+                <Col span={6}>
                   <FormItem label="曾用名">
                     {getFieldDecorator('old_name', {
                       initialValue: editData ? editData.old_name : null,
@@ -322,7 +332,7 @@ class BaseInfo extends React.PureComponent<IProps, IState> {
                     )}
                   </FormItem>
                 </Col>
-                <Col span={8}>
+                <Col span={6}>
                   <FormItem label="民族">
                     {getFieldDecorator('min_zu', {
                       initialValue: editData ? editData.min_zu.toString() : null,
@@ -342,9 +352,27 @@ class BaseInfo extends React.PureComponent<IProps, IState> {
                     )}
                   </FormItem>
                 </Col>
+                <Col span={6}>
+                  <FormItem label="生日">
+                    {getFieldDecorator('birthday', {
+                      initialValue: (editData && editData.birthday)
+                        ? moment(editData.birthday, 'YYYY-MM-DD')
+                        : null,
+                      rules: [
+                        { required: true, message: '请选择日期' }
+                      ],
+                    })(
+                      <DatePicker
+                        locale={locale}
+                        format="YYYY-MM-DD"
+                        disabled={!!editAble ? false : true}
+                      />
+                    )}
+                  </FormItem>
+                </Col>
               </Row>
               <Row>
-                <Col span={8}>
+                <Col span={6}>
                   <FormItem label="性别">
                     {getFieldDecorator('gender', {
                       initialValue: editData ? editData.gender.toString() : null,
@@ -363,7 +391,7 @@ class BaseInfo extends React.PureComponent<IProps, IState> {
                     )}
                   </FormItem>
                 </Col>
-                <Col span={8}>
+                <Col span={6}>
                   <FormItem label="身份证号码">
                     {getFieldDecorator('id_card', {
                       initialValue: editData ? editData.id_card : null,
@@ -377,7 +405,7 @@ class BaseInfo extends React.PureComponent<IProps, IState> {
                     )}
                   </FormItem>
                 </Col>
-                <Col span={8}>
+                <Col span={6}>
                   <FormItem label="工作单位">
                     {getFieldDecorator('company', {
                       initialValue: editData ? editData.company : null,
@@ -391,9 +419,47 @@ class BaseInfo extends React.PureComponent<IProps, IState> {
                     )}
                   </FormItem>
                 </Col>
+                <Col span={6}>
+                  <FormItem label="是否在编">
+                    {getFieldDecorator('zai_bian', {
+                      initialValue: editData ? editData.zai_bian : 0,
+                      rules: [
+                        { required: true, message: '请选择是否在编' }
+                      ],
+                    })(
+                      <Select
+                        // style={{ width: 200 }}
+                        disabled={!!editAble ? false : true}
+                      >
+                        {boolList.map((item: any) => (
+                          <Option value={item.value} key={item.value}>{item.label}</Option>
+                        ))}
+                      </Select>
+                    )}
+                  </FormItem>
+                </Col>
               </Row>
               <Row>
-                <Col span={8}>
+                <Col span={6}>
+                  <FormItem label="校区">
+                    {getFieldDecorator('campus', {
+                      initialValue: editData ? editData.campus.toString() : null,
+                      rules: [
+                        { required: true, message: '请选择校区' }
+                      ],
+                    })(
+                      <Select
+                        // style={{ width: 200 }}
+                        disabled={!!editAble ? false : true}
+                      >
+                        {getOption('campus').map((item: any) => (
+                          <Option value={item.value} key={item.value}>{item.label}</Option>
+                        ))}
+                      </Select>
+                    )}
+                  </FormItem>
+                </Col>
+                <Col span={6}>
                   <FormItem label="单位类别">
                     {getFieldDecorator('company_type', {
                       initialValue: editData ? editData.company_type.toString() : null,
@@ -412,7 +478,7 @@ class BaseInfo extends React.PureComponent<IProps, IState> {
                     )}
                   </FormItem>
                 </Col>
-                <Col span={8}>
+                <Col span={6}>
                   <FormItem label="申报系列">
                     {getFieldDecorator('apply_series', {
                       initialValue: editData ? editData.apply_series.toString() : null,
@@ -431,7 +497,7 @@ class BaseInfo extends React.PureComponent<IProps, IState> {
                     )}
                   </FormItem>
                 </Col>
-                <Col span={8}>
+                <Col span={6}>
                   <FormItem label="申报学科">
                     {getFieldDecorator('apply_course', {
                       initialValue: editData ? editData.apply_course.toString() : null,

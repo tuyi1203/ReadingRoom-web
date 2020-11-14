@@ -171,6 +171,7 @@ class Research extends React.PureComponent<IProps, IState> {
         'subject_status',
         'subject_level',
         'achievement_type',
+        'award_position'
       ],
     });
 
@@ -270,17 +271,27 @@ class Research extends React.PureComponent<IProps, IState> {
     /*
      * 获取数据字典中某个类别的列表
      */
-    const getOption = (keyName: string): any[] => {
+    const getOption = (keyName: string, range?: any): any[] => {
       const list: any[] = [];
       if (!_.isEmpty(dictList)) {
         const data = dictList[keyName];
         console.log(data);
 
         data.map((item: any) => {
-          list.push({
-            value: item.dict_value,
-            label: item.dict_name,
-          });
+          if (range) {
+            if (range.find((i: any) => i === item.dict_value)) {
+              list.push({
+                value: item.dict_value,
+                label: item.dict_name,
+              });
+            }
+          } else {
+            list.push({
+              value: item.dict_value,
+              label: item.dict_name,
+            });
+          }
+
         });
       }
       return list;
@@ -332,6 +343,20 @@ class Research extends React.PureComponent<IProps, IState> {
     if (this.state.defaultActiveKey === '1') {
       column = [
         {
+          title: '著述类型',
+          key: 'achievement_type',
+          dataIndex: 'achievement_type',
+          width: 200,
+          render: (text: any, record: any) => {
+            // console.log(getOption('achievement_type'));
+            return (
+              <span>
+                {text && _.find(getOption('achievement_type'), ['value', text.toString()])?.label}
+              </span>
+            );
+          }
+        },
+        {
           title: '学科领域',
           key: 'course',
           dataIndex: 'course',
@@ -361,7 +386,7 @@ class Research extends React.PureComponent<IProps, IState> {
           }
         },
         {
-          title: '论文名称',
+          title: '著述名称',
           key: 'paper_title',
           dataIndex: 'paper_title',
           width: 200,
@@ -422,6 +447,20 @@ class Research extends React.PureComponent<IProps, IState> {
 
     if (this.state.defaultActiveKey === '2') {
       column = [
+        {
+          title: '课题类型',
+          key: 'achievement_type',
+          dataIndex: 'achievement_type',
+          width: 200,
+          render: (text: any, record: any) => {
+            // console.log(getOption('achievement_type'));
+            return (
+              <span>
+                {text && _.find(getOption('achievement_type'), ['value', text.toString()])?.label}
+              </span>
+            );
+          }
+        },
         {
           title: '学科领域',
           key: 'course',
@@ -855,9 +894,9 @@ class Research extends React.PureComponent<IProps, IState> {
               this.state.defaultActiveKey === '1'
               &&
               <Select mode="multiple" placeholder="请选择筛选条件" className="filter-select" onChange={changeFilter}>
-                <Option value={'paper_title'}>论文名称</Option>
-                <Option value={'paper_date_from'}>论文发表时间（开始）</Option>
-                <Option value={'paper_date_to'}>论文发表时间（结束）</Option>
+                <Option value={'paper_title'}>著述名称</Option>
+                <Option value={'paper_date_from'}>著述发表时间（开始）</Option>
+                <Option value={'paper_date_to'}>著述发表时间（结束）</Option>
                 <Option value={'award'}>是否获奖</Option>
               </Select>
             }
@@ -903,17 +942,17 @@ class Research extends React.PureComponent<IProps, IState> {
                 <Form className="filter-form" layout="inline" labelCol={{ span: 10 }} wrapperCol={{ span: 14 }}>
                   {
                     this.state.filterItems.indexOf('paper_title') >= 0 &&
-                    <Form.Item label="论文名称">
+                    <Form.Item label="著述名称">
                       {getFieldDecorator('paper_title', {
                         rules: [],
                       })(
-                        <Input placeholder="请输入论文名称（支持模糊匹配）" />
+                        <Input placeholder="请输著述名称（支持模糊匹配）" />
                       )}
                     </Form.Item>
                   }
                   {
                     this.state.filterItems.indexOf('paper_date_from') >= 0 &&
-                    <Form.Item label="论文发表时间（开始）" style={{ margin: 0 }}>
+                    <Form.Item label="著述发表时间（开始）" style={{ margin: 0 }}>
                       {
                         getFieldDecorator('paper_date_from', {
                           // initialValue: record[dataIndex],
@@ -925,7 +964,7 @@ class Research extends React.PureComponent<IProps, IState> {
                   }
                   {
                     this.state.filterItems.indexOf('paper_date_to') >= 0 &&
-                    <Form.Item label="论文发表时间（结束）" style={{ margin: 0 }}>
+                    <Form.Item label="著述发表时间（结束）" style={{ margin: 0 }}>
                       {
                         getFieldDecorator('paper_date_to', {
                           // initialValue: record[dataIndex],
@@ -1069,7 +1108,7 @@ class Research extends React.PureComponent<IProps, IState> {
             }
             {/* 下面是本页的内容 */}
             <Tabs defaultActiveKey={this.state.defaultActiveKey} type="card" onChange={changeTab}>
-              <TabPane tab="论文" key="1" />
+              <TabPane tab="著述" key="1" />
               <TabPane tab="课题" key="2" />
               <TabPane tab="著作" key="3" />
               <TabPane tab="专利或著作权" key="4" />

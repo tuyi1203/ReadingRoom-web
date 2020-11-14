@@ -242,17 +242,27 @@ class Teach extends React.PureComponent<IProps, IState> {
     /*
      * 获取数据字典中某个类别的列表
      */
-    const getOption = (keyName: string): any[] => {
+    const getOption = (keyName: string, range?: any): any[] => {
       const list: any[] = [];
       if (!_.isEmpty(dictList)) {
         const data = dictList[keyName];
         console.log(data);
 
         data.map((item: any) => {
-          list.push({
-            value: item.dict_value,
-            label: item.dict_name,
-          });
+          if (range) {
+            if (range.find((i: any) => i === item.dict_value)) {
+              list.push({
+                value: item.dict_value,
+                label: item.dict_name,
+              });
+            }
+          } else {
+            list.push({
+              value: item.dict_value,
+              label: item.dict_name,
+            });
+          }
+
         });
       }
       return list;
@@ -290,38 +300,51 @@ class Teach extends React.PureComponent<IProps, IState> {
     if (this.state.defaultActiveKey === '1') {
       column = [
         {
-          title: '成果类型',
-          key: 'achievement_type',
-          dataIndex: 'achievement_type',
+          title: '奖励类型',
+          key: 'award_type',
+          dataIndex: 'award_type',
           width: 200,
           render: (text: any, record: any) => {
+            console.log(getOption('award_type'));
             return (
               <span>
-                {text && _.find(getOption('achievement_type'), ['value', text.toString()])?.label}
+                {text && _.find(getOption('award_type'), ['value', text.toString()])?.label}
               </span>
             );
           }
         },
         {
-          title: '获奖时间',
-          key: 'award_date',
-          dataIndex: 'award_date',
-          width: 200,
-          render: (text: any, record: any) => {
-            return (
-              <span>
-                {text && moment(text).format('YYYY-MM')}
-              </span>
-            );
-          }
-        },
-        {
-          title: '表彰主体(本人、本人所带班队、本人所带学生)',
+          title: '表彰奖励内容',
           key: 'award_title',
           dataIndex: 'award_title',
           width: 200,
           render: (text: any, record: any) => {
             return (<span><a onClick={() => showDrawer(record, true)}>{text}</a></span>);
+          }
+        },
+        {
+          title: '指导对象',
+          key: 'teacher_guide_name',
+          dataIndex: 'teacher_guide_name',
+          width: 200,
+        },
+        {
+          title: '指导内容',
+          key: 'teacher_guide_content',
+          dataIndex: 'teacher_guide_content',
+          width: 200,
+        },
+        {
+          title: '获奖级别',
+          key: 'award_level',
+          dataIndex: 'award_level',
+          width: 200,
+          render: (text: any, record: any) => {
+            return (
+              <span>
+                {text && _.find(getOption('award_level'), ['value', text.toString()])?.label}
+              </span>
+            );
           }
         },
         {
@@ -338,10 +361,17 @@ class Teach extends React.PureComponent<IProps, IState> {
           }
         },
         {
-          title: '本人作用',
-          key: 'award_role',
-          dataIndex: 'award_role',
+          title: '获奖时间',
+          key: 'award_date',
+          dataIndex: 'award_date',
           width: 200,
+          render: (text: any, record: any) => {
+            return (
+              <span>
+                {text && moment(text).format('YYYY-MM')}
+              </span>
+            );
+          }
         },
         {
           title: '',
@@ -452,6 +482,9 @@ class Teach extends React.PureComponent<IProps, IState> {
           key: 'teacher_guide_name',
           dataIndex: 'teacher_guide_name',
           width: 200,
+          render: (text: any, record: any) => {
+            return (<span><a onClick={() => showDrawer(record, true)}>{text}</a></span>);
+          }
         },
         {
           title: '指导内容',
@@ -527,6 +560,13 @@ class Teach extends React.PureComponent<IProps, IState> {
           if (this.state.defaultActiveKey === '1') {
             if (params.award_date) {
               params.award_date = moment(params.award_date).format('YYYY-MM') + '-' + '01';
+            }
+            if (params.teacher_guide_date_start) {
+              params.teacher_guide_date_start = moment(params.teacher_guide_date_start).format('YYYY-MM') + '-' + '01';
+            }
+
+            if (params.teacher_guide_date_end) {
+              params.teacher_guide_date_end = moment(params.teacher_guide_date_end).format('YYYY-MM') + '-' + '01';
             }
           }
 
@@ -608,6 +648,8 @@ class Teach extends React.PureComponent<IProps, IState> {
               <Select mode="multiple" placeholder="请选择筛选条件" className="filter-select" onChange={changeFilter}>
                 <Option value={'award_date_from'}>获奖时间（开始）</Option>
                 <Option value={'award_date_to'}>获奖时间（结束）</Option>
+                <Option value={'teacher_guide_name'}>指导对象姓名</Option>
+                <Option value={'teacher_guide_content'}>指导内容</Option>
                 <Option value={'award_main'}>表彰主体(本人、本人所带班队、本人所带学生)</Option>
               </Select>
             }
@@ -733,9 +775,9 @@ class Teach extends React.PureComponent<IProps, IState> {
             }
             {/* 下面是本页的内容 */}
             <Tabs defaultActiveKey={this.state.defaultActiveKey} type="card" onChange={changeTab}>
-              <TabPane tab="表彰奖励情况" key="1" />
+              <TabPane tab="指导参赛奖" key="1" />
               <TabPane tab="交流管理经验情况" key="2" />
-              <TabPane tab="指导情况" key="3" />
+              {/* <TabPane tab="指导情况" key="3" /> */}
             </Tabs>
             <Table
               columns={column}

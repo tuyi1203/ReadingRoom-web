@@ -63,9 +63,9 @@ export interface IState {
 }
 
 /**
- * Moral
+ * Qualification
  */
-class Moral extends React.PureComponent<IProps, IState> {
+class Qualification extends React.PureComponent<IProps, IState> {
 
   tableData: any[];
 
@@ -1203,4 +1203,4 @@ class Moral extends React.PureComponent<IProps, IState> {
   }
 }
 
-export default Form.create({})(Moral);
+export default Form.create({})(Qualification);

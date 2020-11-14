@@ -28,7 +28,8 @@ export interface IProps {
 
 /** State接口，定义需要用到的State类型，constructor中的state应该和此定义的类型一致 */
 export interface IState {
-
+  dictCategoryId: number;
+  dictCategoryName: string;
   page: number;
   pageSize: number;
   total: number;
@@ -44,13 +45,15 @@ export interface IState {
  */
 class Datadict extends React.PureComponent<IProps, IState> {
 
-  dictCategoryId?: number;
+  // dictCategoryId?: number;
 
-  dictCategoryName?: string;
+  // dictCategoryName?: string;
 
   constructor(props: any) {
     super(props);
     this.state = {
+      dictCategoryId: -1,
+      dictCategoryName: '',
       page: 1,
       pageSize: 10,
       total: 0, // 总条数
@@ -63,18 +66,19 @@ class Datadict extends React.PureComponent<IProps, IState> {
   }
 
   UNSAFE_componentWillMount() {
-    this.dictCategoryName = this.props.location.pathname.substring(this.props.location.pathname.lastIndexOf('/') + 1);
-    console.log(this.props, this.dictCategoryName);
-    this.getCategoryId(this.dictCategoryName);
-    this.getList();
+
+    // console.log(this.props, this.dictCategoryName);
+    this.getCategoryId();
+
   }
 
   /*
    * 获取类型ID
    */
-  getCategoryId = async (categoryName?: string) => {
+  getCategoryId = async () => {
+    let dictCategoryName = this.props.location.pathname.substring(this.props.location.pathname.lastIndexOf('/') + 1);
     const param: any = {
-      category_name: categoryName
+      category_name: dictCategoryName
     };
 
     const res = await progress.getDictCategory(param);
@@ -84,73 +88,25 @@ class Datadict extends React.PureComponent<IProps, IState> {
     }
 
     if (res) {
-      this.dictCategoryId = res.results.data[0].id;
-      // this.setState({
-      //   dictList: res.results.data,
-      // });
-      // console.log(this.dictCategoryId);
+      this.setState({
+        dictCategoryName: dictCategoryName,
+        dictCategoryId: res.results.data[0].id,
+      }, () => {
+        this.getList();
+      });
     }
 
   }
 
   /*
-   * 获取研究成果列表
+   * 获取数据字典列表
    */
   getList = async () => {
     const param: any = {
       page: this.state.page,
       page_size: this.state.pageSize,
-      category_name: this.dictCategoryName,
+      category_name: this.state.dictCategoryName,
     };
-
-    // console.log(this.state.filterParam);
-    // 增加筛选条件
-    /*
-    if (this.state.filterParam) {
-      if (this.state.filterParam.paper_title) {
-        param.paper_title = this.state.filterParam.paper_title;
-      }
-      if (this.state.filterParam.paper_date_from) {
-        param.paper_date_from = moment(this.state.filterParam.paper_date_from).format('YYYY-MM') + '-01';
-      }
-      if (this.state.filterParam.paper_date_to) {
-        param.paper_date_to = moment(this.state.filterParam.paper_date_to).format('YYYY-MM') + '-01';
-      }
-      if (this.state.filterParam.award) {
-        param.award = this.state.filterParam.award;
-      }
-      if (this.state.filterParam.subject_title) {
-        param.subject_title = this.state.filterParam.subject_title;
-      }
-      if (this.state.filterParam.subject_responseable_man) {
-        param.subject_responseable_man = this.state.filterParam.subject_responseable_man;
-      }
-      if (this.state.filterParam.subject_status) {
-        param.subject_status = this.state.filterParam.subject_status;
-      }
-      if (this.state.filterParam.book_title) {
-        param.book_title = this.state.filterParam.book_title;
-      }
-      if (this.state.filterParam.book_type) {
-        param.book_type = this.state.filterParam.book_type;
-      }
-      if (this.state.filterParam.book_publish_company_name) {
-        param.book_publish_company_name = this.state.filterParam.book_publish_company_name;
-      }
-      if (this.state.filterParam.book_publish_date_from) {
-        param.book_publish_date_from = moment(this.state.filterParam.book_publish_date_from).format('YYYY-MM') + '-01';
-      }
-      if (this.state.filterParam.book_publish_date_to) {
-        param.book_publish_date_to = moment(this.state.filterParam.book_publish_date_to).format('YYYY-MM') + '-01';
-      }
-      if (this.state.filterParam.copyright_type) {
-        param.copyright_type = this.state.filterParam.copyright_type;
-      }
-      if (this.state.filterParam.copyright_title) {
-        param.copyright_title = this.state.filterParam.copyright_title;
-      }
-    }
-    */
 
     const res = await progress.getDicts(param);
     // console.log(res.code);
@@ -167,13 +123,18 @@ class Datadict extends React.PureComponent<IProps, IState> {
   }
 
   render() {
-
     const {
       total,
       page,
       pageSize,
       dictList,
+      dictCategoryName,
     } = this.state;
+
+    if (this.props.location.pathname.substring(this.props.location.pathname.lastIndexOf('/') + 1)
+      !== dictCategoryName) {
+      this.getCategoryId();
+    }
 
     // const { getFieldDecorator } = this.props.form;
 
@@ -324,7 +285,7 @@ class Datadict extends React.PureComponent<IProps, IState> {
             res = await progress.editDictData(params, this.state.editData.id);
           } else {
             // 新增
-            params.dict_category = this.dictCategoryId;
+            params.dict_category = this.state.dictCategoryId;
             res = await progress.addDictData(params);
           }
           if (res.code) {

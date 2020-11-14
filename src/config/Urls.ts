@@ -60,6 +60,17 @@ enum Urls {
   addDictData = '/progress/dict/', // 新增数据字典数据
   editDictData = '/progress/dict/{id}', // 修改数据字典数据
   deleteDictData = '/progress/dict/{id}', // 删除数据字典数据
+  getTeacherBaseinfoList = '/progress/teacher', // 获取教师基本信息列表
+  getTeacherBaseInfoDetail = '/progress/teacher/{id}', // 获取教师基本信息详情
+  getTeacherTeachDetail = '/progress/teacher/teach/{id}', // 获取教师教育经历信息详情
+  getTeacherEducateDetail = '/progress/teacher/educate/{id}', // 获取教师教学经历信息详情
+  getTeacherResearchDetail = '/progress/teacher/research/{id}', // 获取教师科研经历信息详情
+  getAwardAchievementList = '/progress/award/achievement/', // 获取用户荣誉列表
+  editAwardAchievement = '/progress/award/achievement/{id}', // 修改用户荣誉数据
+  delAwardAchievement = '/progress/award/achievement/{id}', // 删除用户荣誉数据
+  getAwardAchievementDetail = '/progress/award/achievement/{id}', // 获取用户荣誉详情
+  addAwardAchievement = '/progress/award/achievement/', // 新增用户荣誉数据
+  getTeacherPDF = '/progress/teacher/pdf/{id}', // 获取教师信息PDF文件
 
   addFile = '/files/', // 上传文件
   delFile = '/files/{id}/', // 删除文件

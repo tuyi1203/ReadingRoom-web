@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Drawer, Divider, Col, Row, List, Typography, Icon, Button } from 'antd';
+import { Drawer, Divider, Col, Row, List, Typography, Icon, Button, message } from 'antd';
 import _ from 'lodash';
 import moment from 'moment';
-import { files } from 'src/api';
+import { progress, files } from 'src/api';
 // import CommonUtils from 'src/utils/commonUtils';
 
 /** Props接口，定义需要用到的Porps类型 */
@@ -13,31 +13,62 @@ export interface IProps {
   visible: boolean;
   type: string;
   yesOrNoOptions: any;
+  findLabel: any;
   getOption: any;
 }
 
 /** State接口，定义需要用到的State类型，constructor中的state应该和此定义的类型一致 */
 export interface IState {
+  detailData: any;
 }
 
 /**
- * ISPInfoDrawer
+ * TeachDetailDrawer
  */
-class AchievementDrawer extends React.PureComponent<IProps, IState> {
+class TeachDetailDrawer extends React.PureComponent<IProps, IState> {
   constructor(props: any) {
     super(props);
     this.state = {
+      detailData: null,
     };
+  }
+
+  UNSAFE_componentWillMount() {
+    this.getDetail();
+  }
+
+  /**
+   * 获取详情
+   */
+  getDetail = async () => {
+    let params: any = {
+    };
+
+    const res = await progress.getTeacherTeachDetail(params,
+      this.props.drawerData.id);
+    if (res.code) {
+      message.error(res.msg);
+      return;
+    }
+    if (res) {
+      this.setState({
+        detailData: res.results.data,
+      });
+    }
   }
 
   render() {
     const {
-      drawerData,
       onClose,
       type,
       // yesOrNoOptions,
+      findLabel,
       getOption,
     } = this.props;
+
+    const {
+      detailData,
+    } = this.state;
     // console.log(this.props.visible);
     // const pStyle = {
     //   fontSize: 16,
@@ -88,78 +119,32 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
 
     return (
       <Drawer
-        width={800}
+        width={1000}
         placement="right"
         closable={true}
         onClose={onClose}
         visible={this.props.visible}
       >
         <Divider orientation="left">成果信息</Divider>
+        <Row style={{ marginBottom: 12 }}>
+          <Col span={6}>
+            <DescriptionItem value="成果类型" />
+          </Col>
+          <Col span={6}>
+            <DescriptionItem
+              value={detailData && detailData.achievement_type && findLabel(getOption('achievement_type'), detailData.achievement_type)}
+            />
+          </Col>
+        </Row>
         {type === '1' &&
           <span>
-            <Row style={{ marginBottom: 12 }}>
-              <Col span={6}>
-                <DescriptionItem value="奖励类型" />
-              </Col>
-              <Col span={6}>
-                <DescriptionItem
-                  value={drawerData && drawerData.award_type && _.find(getOption('award_type'), ['value', drawerData.award_type.toString()])?.label}
-                />
-              </Col>
-            </Row>
-            <Row style={{ marginBottom: 12 }}>
-              <Col span={6}>
-                <DescriptionItem value="指导开始时间" />
-              </Col>
-              <Col span={6}>
-                <DescriptionItem
-                  value={drawerData.teacher_guide_date_start && moment(drawerData.teacher_guide_date_start).format('YYYY-MM')}
-                />
-              </Col>
-              <Col span={6}>
-                <DescriptionItem value="指导结束时间" />
-              </Col>
-              <Col span={6}>
-                <DescriptionItem
-                  value={drawerData.teacher_guide_date_end && moment(drawerData.teacher_guide_date_end).format('YYYY-MM')}
-                />
-              </Col>
-            </Row>
-            <Row style={{ marginBottom: 12 }}>
-              <Col span={6}>
-                <DescriptionItem value="指导对象姓名" />
-              </Col>
-              <Col span={6}>
-                <DescriptionItem
-                  value={drawerData && drawerData.teacher_guide_name}
-                />
-              </Col>
-              <Col span={6}>
-                <DescriptionItem value="指导内容" />
-              </Col>
-              <Col span={6}>
-                <DescriptionItem
-                  value={drawerData && drawerData.teacher_guide_content}
-                />
-              </Col>
-            </Row>
-            <Row style={{ marginBottom: 12 }}>
-              <Col span={6}>
-                <DescriptionItem value="指导效果及荣誉和备注" />
-              </Col>
-              <Col span={6}>
-                <DescriptionItem
-                  value={drawerData && drawerData.teacher_guide_effect}
-                />
-              </Col>
-            </Row>
             <Row style={{ marginBottom: 12 }}>
               <Col span={6}>
                 <DescriptionItem value="获奖时间" />
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={drawerData && drawerData.award_date && moment(drawerData.award_date).format('YYYY-MM')}
+                  value={detailData && detailData.award_date && moment(detailData.award_date).format('YYYY-MM')}
                 />
               </Col>
             </Row>
@@ -169,7 +154,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
               </Col>
               <Col span={12}>
                 <DescriptionItem
-                  value={drawerData && drawerData.award_main}
+                  value={detailData && detailData.award_main}
                 />
               </Col>
             </Row>
@@ -179,7 +164,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={drawerData && drawerData.award_title}
+                  value={detailData && detailData.award_title}
                 />
               </Col>
               <Col span={6}>
@@ -187,7 +172,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={drawerData && drawerData.award_type && _.find(getOption('award_type'), ['value', drawerData.award_type.toString()])?.label}
+                  value={detailData && detailData.award_type && findLabel(getOption('award_type'), detailData.award_type)}
                 />
               </Col>
             </Row>
@@ -197,7 +182,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={drawerData && drawerData.award_level && _.find(getOption('award_level'), ['value', drawerData.award_level.toString()])?.label}
+                  value={detailData && detailData.award_level && findLabel(getOption('award_level'), detailData.award_level)}
                 />
               </Col>
               <Col span={6}>
@@ -205,7 +190,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={drawerData && drawerData.award_position && _.find(getOption('award_position'), ['value', drawerData.award_position.toString()])?.label}
+                  value={detailData && detailData.award_position && findLabel(getOption('award_position'), detailData.award_position)}
                 />
               </Col>
             </Row>
@@ -215,7 +200,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={drawerData && drawerData.award_role}
+                  value={detailData && detailData.award_role}
                 />
               </Col>
               <Col span={6}>
@@ -223,7 +208,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={drawerData && drawerData.award_authoriry_organization}
+                  value={detailData && detailData.award_authoriry_organization}
                 />
               </Col>
             </Row>
@@ -233,7 +218,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={drawerData && drawerData.award_authoriry_country}
+                  value={detailData && detailData.award_authoriry_country}
                 />
               </Col>
             </Row>
@@ -243,21 +228,11 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
           <span>
             <Row style={{ marginBottom: 12 }}>
               <Col span={6}>
-                <DescriptionItem value="成果类型" />
-              </Col>
-              <Col span={6}>
-                <DescriptionItem
-                  value={drawerData && drawerData.achievement_type && _.find(getOption('achievement_type'), ['value', drawerData.achievement_type.toString()])?.label}
-                />
-              </Col>
-            </Row>
-            <Row style={{ marginBottom: 12 }}>
-              <Col span={6}>
                 <DescriptionItem value="交流管理经验时间" />
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={drawerData && drawerData.manage_exp_communicate_date && moment(drawerData.manage_exp_communicate_date).format('YYYY-MM')}
+                  value={detailData && detailData.manage_exp_communicate_date && moment(detailData.manage_exp_communicate_date).format('YYYY-MM')}
                 />
               </Col>
               <Col span={6}>
@@ -265,7 +240,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={drawerData && drawerData.manage_exp_communicate_content}
+                  value={detailData && detailData.manage_exp_communicate_content}
                 />
               </Col>
             </Row>
@@ -275,7 +250,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={drawerData && drawerData.manage_exp_communicate_role}
+                  value={detailData && detailData.manage_exp_communicate_role}
                 />
               </Col>
               <Col span={6}>
@@ -283,7 +258,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={drawerData && drawerData.manage_exp_communicate_range}
+                  value={detailData && detailData.manage_exp_communicate_range}
                 />
               </Col>
             </Row>
@@ -293,31 +268,11 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
           <span>
             <Row style={{ marginBottom: 12 }}>
               <Col span={6}>
-                <DescriptionItem value="成果类型" />
-              </Col>
-              <Col span={6}>
-                <DescriptionItem
-                  value={drawerData && drawerData.achievement_type && _.find(getOption('achievement_type'), ['value', drawerData.achievement_type.toString()])?.label}
-                />
-              </Col>
-            </Row>
-            <Row style={{ marginBottom: 12 }}>
-              <Col span={6}>
-                <DescriptionItem value="成果类型" />
-              </Col>
-              <Col span={6}>
-                <DescriptionItem
-                  value={drawerData && drawerData.achievement_type && _.find(getOption('achievement_type'), ['value', drawerData.achievement_type.toString()])?.label}
-                />
-              </Col>
-            </Row>
-            <Row style={{ marginBottom: 12 }}>
-              <Col span={6}>
                 <DescriptionItem value="指导开始时间" />
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={drawerData.teacher_guide_date_start && moment(drawerData.teacher_guide_date_start).format('YYYY-MM')}
+                  value={detailData && detailData.teacher_guide_date_start && moment(detailData.teacher_guide_date_start).format('YYYY-MM')}
                 />
               </Col>
               <Col span={6}>
@@ -325,7 +280,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={drawerData.teacher_guide_date_end && moment(drawerData.teacher_guide_date_end).format('YYYY-MM')}
+                  value={detailData &&  detailData.teacher_guide_date_end && moment(detailData.teacher_guide_date_end).format('YYYY-MM')}
                 />
               </Col>
             </Row>
@@ -335,7 +290,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={drawerData && drawerData.teacher_guide_name}
+                  value={detailData && detailData.teacher_guide_name}
                 />
               </Col>
               <Col span={6}>
@@ -343,7 +298,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={drawerData && drawerData.teacher_guide_content}
+                  value={detailData && detailData.teacher_guide_content}
                 />
               </Col>
             </Row>
@@ -353,7 +308,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={drawerData && drawerData.teacher_guide_effect}
+                  value={detailData && detailData.teacher_guide_effect}
                 />
               </Col>
             </Row>
@@ -361,12 +316,12 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
         }
         <Divider orientation="left">印证材料</Divider>
         {
-          drawerData
-          && drawerData.achievement_files.length > 0
+          detailData
+          && detailData.files.length > 0
           &&
           <List
             bordered={true}
-            dataSource={drawerData.achievement_files}
+            dataSource={detailData.files}
             renderItem={(item: any) => (
               <List.Item>
                 <Typography.Text>
@@ -383,4 +338,4 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
   }
 }
 
-export default AchievementDrawer;
+export default TeachDetailDrawer;
