@@ -117,7 +117,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
           <span>
             <Row style={{ marginBottom: 12 }}>
               <Col span={6}>
-                <DescriptionItem value="论文名称" />
+                <DescriptionItem value="著述名称" />
               </Col>
               <Col span={6}>
                 <DescriptionItem
@@ -253,7 +253,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
             </Row>
             <Row>
               <Col span={6}>
-                <DescriptionItem value="论文收录情况" />
+                <DescriptionItem value="著述收录情况" />
               </Col>
               <Col span={6}>
                 <span style={{ whiteSpace: 'pre-wrap' }}>

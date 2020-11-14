@@ -20,7 +20,6 @@ const routers = [
   <Route key="/infra/netelementmanager" path="*/infra/netelementmanager" component={NetElementManager} />, // 网元管理
   <Route key="/ispmanager" path="*/ispmanager/" component={ISPManager} />, // 运营商管理
   <Route key="/ipmanager" path="*/ipmanager/" component={IPManager} />, // IP资源管理
-  <Route key="/ipmanager" path="*/ipmanager/" component={IPManager} />, // IP资源管理
 ];
 
 export default routers;

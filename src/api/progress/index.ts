@@ -38,6 +38,11 @@ import getTeacherBaseInfoDetail from './getTeacherBaseInfoDetail';
 import getTeacherTeachDetail from './getTeacherTeachDetail';
 import getTeacherEducateDetail from './getTeacherEducateDetail';
 import getTeacherResearchDetail from './getTeacherResearchDetail';
+import addAwardAchievement from './addAwardAchievement';
+import delAwardAchievement from './delAwardAchievement';
+import editAwardAchievement from './editAwardAchievement';
+import getAwardAchievementDetail from './getAwardAchievementDetail';
+import getAwardAchievementList from './getAwardAchievementList';
 import getTeacherPDF from './getTeacherPDF';
 export default {
   getBaseInfoDetail,
@@ -80,5 +85,10 @@ export default {
   getTeacherTeachDetail,
   getTeacherEducateDetail,
   getTeacherResearchDetail,
+  addAwardAchievement,
+  delAwardAchievement,
+  editAwardAchievement,
+  getAwardAchievementDetail,
+  getAwardAchievementList,
   getTeacherPDF,
 };
