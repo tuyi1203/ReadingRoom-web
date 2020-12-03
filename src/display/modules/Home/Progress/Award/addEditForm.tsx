@@ -236,7 +236,7 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
                 <Select
                   style={{ width: 400 }}
                 >
-                  {getOption('award_type', ['011']).map((item: any) => (
+                  {getOption('award_type', ['011', '061']).map((item: any) => (
                     <Option value={item.value} key={item.value}>{item.label}</Option>
                   ))}
                 </Select>

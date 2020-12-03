@@ -598,7 +598,7 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
                 <Input />
               )}
             </FormItem>
-            <FormItem label="发表刊物名称">
+            <FormItem label="课题批准号">
               {getFieldDecorator('subject_no', {
                 initialValue: editData ? editData.subject_no : null,
                 rules: [
@@ -949,6 +949,22 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
         }
         {defaultActiveKey === '4' &&
           <span>
+            <FormItem label="成果类型">
+              {getFieldDecorator('achievement_type', {
+                initialValue: editData ? editData.achievement_type.toString() : null,
+                rules: [
+                  { required: true, message: '请选择成果类型' }
+                ],
+              })(
+                <Select
+                  style={{ width: 400 }}
+                >
+                  {getOption('achievement_type', ['053']).map((item: any) => (
+                    <Option value={item.value} key={item.value}>{item.label}</Option>
+                  ))}
+                </Select>
+              )}
+            </FormItem>
             <FormItem label="专利或软件著作权类型">
               {getFieldDecorator('copyright_type', {
                 initialValue: editData ? editData.copyright_type : null,

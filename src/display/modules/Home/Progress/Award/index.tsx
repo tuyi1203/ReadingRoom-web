@@ -94,7 +94,7 @@ class Award extends React.PureComponent<IProps, IState> {
     let param: any = {
       page: this.state.page,
       page_size: this.state.pageSize,
-      type: parseInt(this.state.defaultActiveKey, 10) - 1,
+      type: this.state.defaultActiveKey,
     };
 
     console.log(this.state.filterParam);
@@ -424,7 +424,7 @@ class Award extends React.PureComponent<IProps, IState> {
           let res: any = null;
           let params: any = null;
           params = { ...values };
-          params.type = parseInt(this.state.defaultActiveKey, 10) - 1;
+          params.type = this.state.defaultActiveKey;
 
           params.fileids = this.fileIdsForAddOrEdit;
 
@@ -606,7 +606,7 @@ class Award extends React.PureComponent<IProps, IState> {
             }
             {/* 下面是本页的内容 */}
             <Tabs defaultActiveKey={this.state.defaultActiveKey} type="card" onChange={changeTab}>
-              <TabPane tab="荣誉" key="1" />
+              <TabPane tab="荣誉&其他" key="1" />
             </Tabs>
             {this.state.defaultActiveKey === '1' &&
               <Table

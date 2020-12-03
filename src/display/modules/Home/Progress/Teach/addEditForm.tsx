@@ -406,7 +406,7 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
                 <Input />
               )}
             </FormItem>
-            
+
             <FormItem label="印证材料">
               <Upload
                 name="file"
@@ -457,6 +457,22 @@ class AddEditModal extends React.PureComponent<IProps, IState> {
         }
         {defaultActiveKey === '2' &&
           <span>
+            <FormItem label="成果类型">
+              {getFieldDecorator('achievement_type', {
+                initialValue: editData && editData.achievement_type ? editData.achievement_type.toString() : null,
+                rules: [
+                  { required: true, message: '请选择成果类型' }
+                ],
+              })(
+                <Select
+                  style={{ width: 400 }}
+                >
+                  {getOption('achievement_type', ['064']).map((item: any) => (
+                    <Option value={item.value} key={item.value}>{item.label}</Option>
+                  ))}
+                </Select>
+              )}
+            </FormItem>
             <FormItem label="交流管理经验时间" style={{ margin: 0 }}>
               {
                 getFieldDecorator('manage_exp_communicate_date', {
