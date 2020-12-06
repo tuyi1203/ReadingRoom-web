@@ -71,6 +71,8 @@ enum Urls {
   getAwardAchievementDetail = '/progress/award/achievement/{id}', // 获取用户荣誉详情
   addAwardAchievement = '/progress/award/achievement/', // 新增用户荣誉数据
   getTeacherPDF = '/progress/teacher/pdf/{id}', // 获取教师信息PDF文件
+  getTeacherAwardList = '/progress/award/search', // 获取教师成果获奖列表数据
+  outputTeacherAwardExcel = '/progress/award/search/excel', // 输出教师成果获奖列表数据为excel
 
   addFile = '/files/', // 上传文件
   delFile = '/files/{id}/', // 删除文件

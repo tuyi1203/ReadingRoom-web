@@ -44,6 +44,8 @@ import editAwardAchievement from './editAwardAchievement';
 import getAwardAchievementDetail from './getAwardAchievementDetail';
 import getAwardAchievementList from './getAwardAchievementList';
 import getTeacherPDF from './getTeacherPDF';
+import getTeacherAwardList from './getTeacherAwardList';
+import outputAwardExcel from './outputAwardExcel';
 export default {
   getBaseInfoDetail,
   getDictList,
@@ -91,4 +93,6 @@ export default {
   getAwardAchievementDetail,
   getAwardAchievementList,
   getTeacherPDF,
+  getTeacherAwardList,
+  outputAwardExcel,
 };

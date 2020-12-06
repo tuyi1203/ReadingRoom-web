@@ -9,6 +9,7 @@ import Educate from './Educate';
 import Datadict from './Datadict';
 import Teacher from './Teacher';
 import Award from './Award';
+import AwardSearch from './AwardSearch';
 
 const routers = [
   <Route key="/baseinfo" path="*/baseinfo" component={BaseInfo} />,
@@ -17,6 +18,7 @@ const routers = [
   <Route key="/research" path="*/research" component={Research} />,
   <Route key="/teach" path="*/teach" component={Teach} />,
   <Route key="/educate" path="*/educate" component={Educate} />,
+  <Route key="/award/search" path="*/award/search" component={AwardSearch} />,
   <Route key="/award" path="*/award" component={Award} />,
   <Route key="/dict" path="*/dict" component={Datadict} />,
   <Route key="/teacher" path="*/teacher" component={Teacher} />,
