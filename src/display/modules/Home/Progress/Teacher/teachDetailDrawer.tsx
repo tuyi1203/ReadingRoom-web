@@ -62,7 +62,7 @@ class TeachDetailDrawer extends React.PureComponent<IProps, IState> {
       onClose,
       type,
       // yesOrNoOptions,
-      findLabel,
+      // findLabel,
       getOption,
     } = this.props;
 
@@ -126,18 +126,64 @@ class TeachDetailDrawer extends React.PureComponent<IProps, IState> {
         visible={this.props.visible}
       >
         <Divider orientation="left">成果信息</Divider>
-        <Row style={{ marginBottom: 12 }}>
-          <Col span={6}>
-            <DescriptionItem value="成果类型" />
-          </Col>
-          <Col span={6}>
-            <DescriptionItem
-              value={detailData && detailData.achievement_type && findLabel(getOption('achievement_type'), detailData.achievement_type)}
-            />
-          </Col>
-        </Row>
         {type === '1' &&
           <span>
+            <Row style={{ marginBottom: 12 }}>
+              <Col span={6}>
+                <DescriptionItem value="奖励类型" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.award_type && _.find(getOption('award_type'), ['value', detailData.award_type.toString()])?.label}
+                />
+              </Col>
+            </Row>
+            <Row style={{ marginBottom: 12 }}>
+              <Col span={6}>
+                <DescriptionItem value="指导开始时间" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.teacher_guide_date_start && moment(detailData.teacher_guide_date_start).format('YYYY-MM')}
+                />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem value="指导结束时间" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.teacher_guide_date_end && moment(detailData.teacher_guide_date_end).format('YYYY-MM')}
+                />
+              </Col>
+            </Row>
+            <Row style={{ marginBottom: 12 }}>
+              <Col span={6}>
+                <DescriptionItem value="指导对象姓名" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.teacher_guide_name}
+                />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem value="指导内容" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.teacher_guide_content}
+                />
+              </Col>
+            </Row>
+            <Row style={{ marginBottom: 12 }}>
+              <Col span={6}>
+                <DescriptionItem value="指导效果及荣誉和备注" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.teacher_guide_effect}
+                />
+              </Col>
+            </Row>
             <Row style={{ marginBottom: 12 }}>
               <Col span={6}>
                 <DescriptionItem value="获奖时间" />
@@ -172,7 +218,7 @@ class TeachDetailDrawer extends React.PureComponent<IProps, IState> {
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={detailData && detailData.award_type && findLabel(getOption('award_type'), detailData.award_type)}
+                  value={detailData && detailData.award_type && _.find(getOption('award_type'), ['value', detailData.award_type.toString()])?.label}
                 />
               </Col>
             </Row>
@@ -182,7 +228,7 @@ class TeachDetailDrawer extends React.PureComponent<IProps, IState> {
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={detailData && detailData.award_level && findLabel(getOption('award_level'), detailData.award_level)}
+                  value={detailData && detailData.award_level && _.find(getOption('award_level'), ['value', detailData.award_level.toString()])?.label}
                 />
               </Col>
               <Col span={6}>
@@ -190,7 +236,7 @@ class TeachDetailDrawer extends React.PureComponent<IProps, IState> {
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={detailData && detailData.award_position && findLabel(getOption('award_position'), detailData.award_position)}
+                  value={detailData && detailData.award_position && _.find(getOption('award_position'), ['value', detailData.award_position.toString()])?.label}
                 />
               </Col>
             </Row>

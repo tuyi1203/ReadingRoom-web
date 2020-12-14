@@ -62,7 +62,7 @@ class EducateDetailDrawer extends React.PureComponent<IProps, IState> {
       onClose,
       type,
       // yesOrNoOptions,
-      findLabel,
+      // findLabel,
       getOption,
     } = this.props;
 
@@ -124,18 +124,18 @@ class EducateDetailDrawer extends React.PureComponent<IProps, IState> {
         visible={this.props.visible}
       >
         <Divider orientation="left">教学成果信息</Divider>
-        <Row style={{ marginBottom: 12 }}>
-          <Col span={6}>
-            <DescriptionItem value="教学成果类型" />
-          </Col>
-          <Col span={6}>
-            <DescriptionItem
-              value={detailData && detailData.achievement_type && findLabel(getOption('achievement_type'), detailData.achievement_type)}
-            />
-          </Col>
-        </Row>
         {type === '2' &&
           <span>
+            <Row style={{ marginBottom: 12 }}>
+              <Col span={6}>
+                <DescriptionItem value="成果类型" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.award_type && _.find(getOption('award_type'), ['value', detailData.award_type.toString()])?.label}
+                />
+              </Col>
+            </Row>
             <Row style={{ marginBottom: 12 }}>
               <Col span={6}>
                 <DescriptionItem value="获奖时间" />
@@ -200,6 +200,16 @@ class EducateDetailDrawer extends React.PureComponent<IProps, IState> {
           <span>
             <Row style={{ marginBottom: 12 }}>
               <Col span={6}>
+                <DescriptionItem value="成果类型" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.achievement_type && _.find(getOption('achievement_type'), ['value', detailData.achievement_type.toString()])?.label}
+                />
+              </Col>
+            </Row>
+            <Row style={{ marginBottom: 12 }}>
+              <Col span={6}>
                 <DescriptionItem value="讲座、示范课时间" />
               </Col>
               <Col span={6}>
@@ -231,6 +241,168 @@ class EducateDetailDrawer extends React.PureComponent<IProps, IState> {
               <Col span={6}>
                 <DescriptionItem
                   value={detailData && detailData.lecture_organization}
+                />
+              </Col>
+            </Row>
+            <Row style={{ marginBottom: 12 }}>
+              <Col span={6}>
+                <DescriptionItem value="发表范围" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.lecture_scope && _.find(getOption('award_level'), ['value', detailData.lecture_scope.toString()])?.label}
+                />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem value="主办单位" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.lecture_organization}
+                />
+              </Col>
+            </Row>
+          </span>
+        }
+        {type === '4' &&
+          <span>
+            <Row style={{ marginBottom: 12 }}>
+              <Col span={6}>
+                <DescriptionItem value="奖励类型" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.award_type && _.find(getOption('award_type'), ['value', detailData.award_type.toString()])?.label}
+                />
+              </Col>
+            </Row>
+            <Row style={{ marginBottom: 12 }}>
+              <Col span={6}>
+                <DescriptionItem value="指导开始时间" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData.teacher_guide_date_start && moment(detailData.teacher_guide_date_start).format('YYYY-MM')}
+                />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem value="指导结束时间" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData.teacher_guide_date_end && moment(detailData.teacher_guide_date_end).format('YYYY-MM')}
+                />
+              </Col>
+            </Row>
+            <Row style={{ marginBottom: 12 }}>
+              <Col span={6}>
+                <DescriptionItem value="指导对象姓名" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.teacher_guide_name}
+                />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem value="指导内容" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.teacher_guide_content}
+                />
+              </Col>
+            </Row>
+            <Row style={{ marginBottom: 12 }}>
+              <Col span={6}>
+                <DescriptionItem value="指导效果及荣誉和备注" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.teacher_guide_effect}
+                />
+              </Col>
+            </Row>
+            <Row style={{ marginBottom: 12 }}>
+              <Col span={6}>
+                <DescriptionItem value="获奖时间" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.award_date && moment(detailData.award_date).format('YYYY-MM')}
+                />
+              </Col>
+            </Row>
+            <Row style={{ marginBottom: 12 }}>
+              <Col span={12}>
+                <DescriptionItem value="表彰主体(本人、本人所带班队、本人所带学生)" />
+              </Col>
+              <Col span={12}>
+                <DescriptionItem
+                  value={detailData && detailData.award_main}
+                />
+              </Col>
+            </Row>
+            <Row style={{ marginBottom: 12 }}>
+              <Col span={6}>
+                <DescriptionItem value="表彰奖励内容" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.award_title}
+                />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem value="获奖类别" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.award_type && _.find(getOption('award_type'), ['value', detailData.award_type.toString()])?.label}
+                />
+              </Col>
+            </Row>
+            <Row style={{ marginBottom: 12 }}>
+              <Col span={6}>
+                <DescriptionItem value="获奖级别" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.award_level && _.find(getOption('award_level'), ['value', detailData.award_level.toString()])?.label}
+                />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem value="获奖等次" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.award_position && _.find(getOption('award_position'), ['value', detailData.award_position.toString()])?.label}
+                />
+              </Col>
+            </Row>
+            <Row style={{ marginBottom: 12 }}>
+              <Col span={6}>
+                <DescriptionItem value="本人作用" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.award_role}
+                />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem value="授奖单位" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.award_authoriry_organization}
+                />
+              </Col>
+            </Row>
+            <Row style={{ marginBottom: 12 }}>
+              <Col span={6}>
+                <DescriptionItem value="授奖国家(地区）" />
+              </Col>
+              <Col span={6}>
+                <DescriptionItem
+                  value={detailData && detailData.award_authoriry_country}
                 />
               </Col>
             </Row>

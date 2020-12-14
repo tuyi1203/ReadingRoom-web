@@ -92,6 +92,9 @@ class EducateDrawer extends React.PureComponent<IProps, IState> {
     } else if (this.state.defaultActiveKey === '3') {
       params.category = 'list';
       params.category_type = 2;
+    } else if (this.state.defaultActiveKey === '4') {
+      params.category = 'list';
+      params.category_type = 3;
     }
 
     const res = await progress.getTeacherBaseInfoDetail(params,
@@ -210,14 +213,14 @@ class EducateDrawer extends React.PureComponent<IProps, IState> {
       columns = [
         {
           title: '成果类型',
-          key: 'achievement_type',
-          dataIndex: 'achievement_type',
+          key: 'award_type',
+          dataIndex: 'award_type',
           width: 200,
           render: (text: any, record: any) => {
-            console.log(getOption('achievement_type'));
+            // console.log(getOption('award_type'));
             return (
               <span>
-                {text && findLabel(getOption('achievement_type'), text)}
+                {text && _.find(getOption('award_type'), ['value', text.toString()])?.label}
               </span>
             );
           }
@@ -239,7 +242,7 @@ class EducateDrawer extends React.PureComponent<IProps, IState> {
           render: (text: any, record: any) => {
             return (
               <span>
-                {text && findLabel(getOption('award_level'), text)}
+                {text && _.find(getOption('award_level'), ['value', text.toString()])?.label}
               </span>
             );
           }
@@ -252,7 +255,7 @@ class EducateDrawer extends React.PureComponent<IProps, IState> {
           render: (text: any, record: any) => {
             return (
               <span>
-                {text && findLabel(getOption('award_position'), text)}
+                {text && _.find(getOption('award_position'), ['value', text.toString()])?.label}
               </span>
             );
           }
@@ -284,7 +287,7 @@ class EducateDrawer extends React.PureComponent<IProps, IState> {
             console.log(getOption('achievement_type'));
             return (
               <span>
-                {text && findLabel(getOption('achievement_type'), text)}
+                {text && _.find(getOption('achievement_type'), ['value', text.toString()])?.label}
               </span>
             );
           }
@@ -326,6 +329,85 @@ class EducateDrawer extends React.PureComponent<IProps, IState> {
       ];
     }
 
+    if (this.state.defaultActiveKey === '4') {
+      columns = [
+        {
+          title: '奖励类型',
+          key: 'award_type',
+          dataIndex: 'award_type',
+          width: 200,
+          render: (text: any, record: any) => {
+            console.log(getOption('award_type'));
+            return (
+              <span>
+                {text && _.find(getOption('award_type'), ['value', text.toString()])?.label}
+              </span>
+            );
+          }
+        },
+        {
+          title: '表彰奖励内容',
+          key: 'award_title',
+          dataIndex: 'award_title',
+          width: 200,
+          render: (text: any, record: any) => {
+            return (<span><a onClick={() => showDrawer(record, true)}>{text}</a></span>);
+          }
+        },
+        {
+          title: '指导对象',
+          key: 'teacher_guide_name',
+          dataIndex: 'teacher_guide_name',
+          width: 200,
+        },
+        {
+          title: '指导内容',
+          key: 'teacher_guide_content',
+          dataIndex: 'teacher_guide_content',
+          width: 200,
+        },
+        {
+          title: '获奖级别',
+          key: 'award_level',
+          dataIndex: 'award_level',
+          width: 200,
+          render: (text: any, record: any) => {
+            return (
+              <span>
+                {text && _.find(getOption('award_level'), ['value', text.toString()])?.label}
+              </span>
+            );
+          }
+        },
+        {
+          title: '获奖等次',
+          key: 'award_position',
+          dataIndex: 'award_position',
+          width: 200,
+          render: (text: any, record: any) => {
+            return (
+              <span>
+                {text && _.find(getOption('award_position'), ['value', text.toString()])?.label}
+              </span>
+            );
+          }
+        },
+        {
+          title: '获奖时间',
+          key: 'award_date',
+          dataIndex: 'award_date',
+          width: 200,
+          render: (text: any, record: any) => {
+            return (
+              <span>
+                {text && moment(text).format('YYYY-MM')}
+              </span>
+            );
+          }
+        },
+      ];
+    }
+
     return (
       <Drawer
         width={1200}
@@ -339,6 +421,7 @@ class EducateDrawer extends React.PureComponent<IProps, IState> {
           <TabPane tab="业绩基本情况" key="1" />
           <TabPane tab="现场课/录像课/微课/课件/基本功" key="2" />
           <TabPane tab="讲座/示范课" key="3" />
+          <TabPane tab="指导参赛奖" key="4" />
         </Tabs>
         {this.state.defaultActiveKey === '1'
           &&

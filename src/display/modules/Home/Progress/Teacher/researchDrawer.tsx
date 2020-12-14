@@ -97,6 +97,7 @@ class ResearchDrawer extends React.PureComponent<IProps, IState> {
     if (res) {
       this.setState({
         listData: res.results.data.data,
+        total: res.results.data.total
       });
     }
   }
@@ -189,6 +190,20 @@ class ResearchDrawer extends React.PureComponent<IProps, IState> {
     if (this.state.defaultActiveKey === '1') {
       columns = [
         {
+          title: '著述类型',
+          key: 'achievement_type',
+          dataIndex: 'achievement_type',
+          width: 200,
+          render: (text: any, record: any) => {
+            // console.log(getOption('achievement_type'));
+            return (
+              <span>
+                {text && _.find(getOption('achievement_type'), ['value', text.toString()])?.label}
+              </span>
+            );
+          }
+        },
+        {
           title: '学科领域',
           key: 'course',
           dataIndex: 'course',
@@ -218,7 +233,7 @@ class ResearchDrawer extends React.PureComponent<IProps, IState> {
           }
         },
         {
-          title: '论文名称',
+          title: '著述名称',
           key: 'paper_title',
           dataIndex: 'paper_title',
           width: 200,
@@ -262,6 +277,20 @@ class ResearchDrawer extends React.PureComponent<IProps, IState> {
 
     if (this.state.defaultActiveKey === '2') {
       columns = [
+        {
+          title: '课题类型',
+          key: 'achievement_type',
+          dataIndex: 'achievement_type',
+          width: 200,
+          render: (text: any, record: any) => {
+            // console.log(getOption('achievement_type'));
+            return (
+              <span>
+                {text && _.find(getOption('achievement_type'), ['value', text.toString()])?.label}
+              </span>
+            );
+          }
+        },
         {
           title: '学科领域',
           key: 'course',
@@ -518,7 +547,7 @@ class ResearchDrawer extends React.PureComponent<IProps, IState> {
       >
         <Divider orientation="left">科研成果信息</Divider>
         <Tabs defaultActiveKey={this.state.defaultActiveKey} type="card" onChange={changeTab}>
-          <TabPane tab="论文" key="1" />
+          <TabPane tab="著述" key="1" />
           <TabPane tab="课题" key="2" />
           <TabPane tab="著作" key="3" />
           <TabPane tab="专利或著作权" key="4" />

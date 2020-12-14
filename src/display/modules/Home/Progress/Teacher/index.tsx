@@ -21,6 +21,7 @@ import MoralDrawer from './moralDrawer';
 import TeachDrawer from './teachDrawer';
 import EducateDrawer from './educateDrawer';
 import ResearchDrawer from './researchDrawer';
+import AwardAndOtherDrawer from './awardAndOtherDrawer';
 
 import CommonButton from 'src/display/components/CommonButton';
 import CurrentPage from 'src/display/components/CurrentPage';
@@ -50,7 +51,7 @@ export interface IState {
   activeDrawer: string;
   showBaseinfoDrawer: boolean;
   showMoralDrawer: boolean;
-  // showAwardDrawer: boolean;
+  showAwardDrawer: boolean;
   showQualificationDrawer: boolean;
   showTeachDrawer: boolean;
   showEducateDrawer: boolean;
@@ -82,7 +83,7 @@ class Teacher extends React.PureComponent<IProps, IState> {
       showTeachDrawer: false,
       showEducateDrawer: false,
       showResearchDrawer: false,
-      // showAwardDrawer: false,
+      showAwardDrawer: false,
       baseinfoDetailData: null,
     };
     this.fileIdsForAddOrEdit = [];
@@ -333,6 +334,11 @@ class Teacher extends React.PureComponent<IProps, IState> {
             showResearchDrawer: true,
           });
           break;
+        case 'award':
+          this.setState({
+            showAwardDrawer: true,
+          });
+          break;
         default:
           this.setState({
             showBaseinfoDrawer: true,
@@ -489,11 +495,13 @@ class Teacher extends React.PureComponent<IProps, IState> {
               <Divider type="vertical" />
               {<a onClick={() => showDrawer(record, 'qualification')}>基本资格</a>}
               <Divider type="vertical" />
-              {<a onClick={() => showDrawer(record, 'teach')}>教育成果</a>}
+              {<a onClick={() => showDrawer(record, 'teach')}>教育成果及获奖</a>}
               <Divider type="vertical" />
-              {<a onClick={() => showDrawer(record, 'educate')}>教学成果</a>}
+              {<a onClick={() => showDrawer(record, 'educate')}>教学成果及获奖</a>}
               <Divider type="vertical" />
-              {<a onClick={() => showDrawer(record, 'research')}>科研成果</a>}
+              {<a onClick={() => showDrawer(record, 'research')}>科研成果及获奖</a>}
+              <Divider type="vertical" />
+              {<a onClick={() => showDrawer(record, 'award')}>荣誉及其他奖励</a>}
               <Divider type="vertical" />
               <Button type="link" onClick={download.bind(this, record.user_id, 'application/x-pdf', record.name)}>下载PDF</Button>
               {/* <Popconfirm title="确认删除吗?" onConfirm={() => del(record)}>
@@ -871,6 +879,18 @@ class Teacher extends React.PureComponent<IProps, IState> {
             findLabel={findLabel}
             onClose={(e: any) => { return onDrawerClose(e, true); }}
             visible={this.state.showResearchDrawer}
+            yesOrNoOptions={this.yesOrNoOptions}
+            getOption={getOption}
+          />
+        }
+        {
+          this.state.activeDrawer === 'award'
+          && <AwardAndOtherDrawer
+            drawerData={this.state.baseinfoDetailData}
+            dictList={this.state.dictList}
+            findLabel={findLabel}
+            onClose={(e: any) => { return onDrawerClose(e, true); }}
+            visible={this.state.showAwardDrawer}
             yesOrNoOptions={this.yesOrNoOptions}
             getOption={getOption}
           />

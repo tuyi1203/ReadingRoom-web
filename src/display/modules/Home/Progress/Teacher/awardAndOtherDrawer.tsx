@@ -4,18 +4,20 @@ import {
   Divider,
   // Col, 
   // Row,
+  // Descriptions,
   Tabs,
   message,
-  Table
+  Table,
 } from 'antd';
 import _ from 'lodash';
 // import DataDic from 'src/dataModel/DataDic';
 import moment from 'moment';
 import {
-  progress
+  progress,
+  // files
 } from 'src/api';
 
-import TeachDetailDrawer from './teachDetailDrawer';
+import AwardAndOtherDetailDrawer from './awardAndOtherDetailDrawer';
 
 const { TabPane } = Tabs;
 // import CommonUtils from 'src/utils/commonUtils';
@@ -38,16 +40,17 @@ export interface IState {
   pageSize: number;
   total: number;
   listData: any;
+  baseinfoData: any;
   defaultActiveKey: string;
   attachList: any;
-  showTeachDetialDrawer: boolean;
-  teachDetailDrawerData: any;
+  showAwardAndOtherDetailDrawer: boolean;
+  awardAndOtherDetailDrawerData: any;
 }
 
 /**
- * TeachDrawer
+ * AwardAndOtherDrawer
  */
-class TeachDrawer extends React.PureComponent<IProps, IState> {
+class AwardAndOtherDrawer extends React.PureComponent<IProps, IState> {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -57,8 +60,9 @@ class TeachDrawer extends React.PureComponent<IProps, IState> {
       listData: null,
       defaultActiveKey: '1',
       attachList: [],
-      showTeachDetialDrawer: false,
-      teachDetailDrawerData: null,
+      showAwardAndOtherDetailDrawer: false,
+      awardAndOtherDetailDrawerData: null,
+      baseinfoData: null,
     };
   }
 
@@ -71,10 +75,9 @@ class TeachDrawer extends React.PureComponent<IProps, IState> {
    */
   getList = async () => {
     let params: any = {
+      type: 'award',
       page_size: this.state.pageSize,
       page: this.state.page,
-      type: 'award',
-      category: this.state.defaultActiveKey
     };
 
     const res = await progress.getTeacherBaseInfoDetail(params,
@@ -86,6 +89,7 @@ class TeachDrawer extends React.PureComponent<IProps, IState> {
     if (res) {
       this.setState({
         listData: res.results.data.data,
+        total: res.results.data.total
       });
     }
   }
@@ -113,7 +117,28 @@ class TeachDrawer extends React.PureComponent<IProps, IState> {
       });
     };
 
-    const { listData, page, pageSize, total } = this.state;
+    /**
+     * 文件下载
+     */
+    // const download = async (id: number, fileType: string, fileName: string) => {
+    //   // console.log(id);
+    //   const res = await files.download(id, {});
+
+    //   const file = new Blob([res.data], {
+    //     type: fileType
+    //   });
+    //   console.log(res);
+    //   const a = document.createElement('a');
+    //   a.download = fileName;
+    //   a.href = URL.createObjectURL(file);
+    //   document.body.appendChild(a);
+    //   a.click();
+    //   document.body.removeChild(a);
+    // };
+
+    const { listData, page, pageSize, total,
+      // baseinfoData
+    } = this.state;
 
     /**
      * 改变页大小
@@ -143,8 +168,8 @@ class TeachDrawer extends React.PureComponent<IProps, IState> {
     const showDrawer = (record: any, achievementOrNot?: boolean, awardOrNot?: boolean) => {
       if (achievementOrNot) {
         this.setState({
-          showTeachDetialDrawer: true,
-          teachDetailDrawerData: record
+          showAwardAndOtherDetailDrawer: true,
+          awardAndOtherDetailDrawerData: record
         });
       }
     };
@@ -156,13 +181,14 @@ class TeachDrawer extends React.PureComponent<IProps, IState> {
 
       if (achievementOrNot) {
         this.setState({
-          showTeachDetialDrawer: false,
-          teachDetailDrawerData: null
+          showAwardAndOtherDetailDrawer: false,
+          awardAndOtherDetailDrawerData: null
         });
       }
     };
 
     let columns: any = [];
+
     if (this.state.defaultActiveKey === '1') {
       columns = [
         {
@@ -187,18 +213,6 @@ class TeachDrawer extends React.PureComponent<IProps, IState> {
           render: (text: any, record: any) => {
             return (<span><a onClick={() => showDrawer(record, true)}>{text}</a></span>);
           }
-        },
-        {
-          title: '指导对象',
-          key: 'teacher_guide_name',
-          dataIndex: 'teacher_guide_name',
-          width: 200,
-        },
-        {
-          title: '指导内容',
-          key: 'teacher_guide_content',
-          dataIndex: 'teacher_guide_content',
-          width: 200,
         },
         {
           title: '获奖级别',
@@ -238,97 +252,6 @@ class TeachDrawer extends React.PureComponent<IProps, IState> {
               </span>
             );
           }
-        }
-      ];
-    }
-
-    if (this.state.defaultActiveKey === '2') {
-      columns = [
-        {
-          title: '交流管理经验时间',
-          key: 'manage_exp_communicate_date',
-          dataIndex: 'manage_exp_communicate_date',
-          width: 200,
-          render: (text: any, record: any) => {
-            return (
-              <span>
-                {text && moment(text).format('YYYY-MM')}
-              </span>
-            );
-          }
-        },
-        {
-          title: '交流管理经验内容',
-          key: 'manage_exp_communicate_content',
-          dataIndex: 'manage_exp_communicate_content',
-          width: 200,
-          render: (text: any, record: any) => {
-            return (<span><a onClick={() => showDrawer(record, true)}>{text}</a></span>);
-          }
-        },
-        {
-          title: '本人作用',
-          key: 'manage_exp_communicate_role',
-          dataIndex: 'manage_exp_communicate_role',
-          width: 200,
-        },
-        {
-          title: '交流范围',
-          key: 'manage_exp_communicate_range',
-          dataIndex: 'manage_exp_communicate_range',
-          width: 200,
-        },
-      ];
-    }
-
-    if (this.state.defaultActiveKey === '3') {
-      columns = [
-        {
-          title: '指导开始时间',
-          key: 'teacher_guide_date_start',
-          dataIndex: 'teacher_guide_date_start',
-          width: 200,
-          render: (text: any, record: any) => {
-            return (
-              <span>
-                {text && moment(text).format('YYYY-MM')}
-              </span>
-            );
-          }
-        },
-        {
-          title: '指导结束时间',
-          key: 'teacher_guide_date_end',
-          dataIndex: 'teacher_guide_date_end',
-          width: 200,
-          render: (text: any, record: any) => {
-            return (
-              <span>
-                {text && moment(text).format('YYYY-MM')}
-              </span>
-            );
-          }
-        },
-        {
-          title: '指导对象姓名',
-          key: 'teacher_guide_name',
-          dataIndex: 'teacher_guide_name',
-          width: 200,
-          render: (text: any, record: any) => {
-            return (<span><a onClick={() => showDrawer(record, true)}>{text}</a></span>);
-          }
-        },
-        {
-          title: '指导内容',
-          key: 'teacher_guide_content',
-          dataIndex: 'teacher_guide_content',
-          width: 200,
-        },
-        {
-          title: '指导效果及荣誉和备注',
-          key: 'teacher_guide_effect',
-          dataIndex: 'teacher_guide_effect',
-          width: 200,
         },
       ];
     }
@@ -341,34 +264,34 @@ class TeachDrawer extends React.PureComponent<IProps, IState> {
         onClose={onClose}
         visible={this.props.visible}
       >
-        <Divider orientation="left">教育成果信息</Divider>
+        <Divider orientation="left">教学成果信息</Divider>
         <Tabs defaultActiveKey={this.state.defaultActiveKey} type="card" onChange={changeTab}>
-          <TabPane tab="指导参赛奖" key="1" />
-          <TabPane tab="交流管理经验情况" key="2" />
-          {/* <TabPane tab="指导情况" key="3" /> */}
+          <TabPane tab="荣誉&其他" key="1" />
         </Tabs>
-        <Table
-          columns={columns}
-          rowKey="id"
-          dataSource={listData}
-          bordered={true}
-          pagination={{
-            size: 'small',
-            showQuickJumper: true,
-            showSizeChanger: true,
-            onChange: changePage,
-            onShowSizeChange: changePageSize,
-            total,
-            current: page,
-            pageSize,
-          }}
-        />
+        {this.state.defaultActiveKey === '1' &&
+          <Table
+            columns={columns}
+            rowKey="id"
+            dataSource={listData}
+            bordered={true}
+            pagination={{
+              size: 'small',
+              showQuickJumper: true,
+              showSizeChanger: true,
+              onChange: changePage,
+              onShowSizeChange: changePageSize,
+              total,
+              current: page,
+              pageSize,
+            }}
+          />
+        }
         {
-          this.state.showTeachDetialDrawer
-          && <TeachDetailDrawer
-            drawerData={this.state.teachDetailDrawerData}
+          this.state.showAwardAndOtherDetailDrawer
+          && <AwardAndOtherDetailDrawer
+            drawerData={this.state.awardAndOtherDetailDrawerData}
             onClose={(e: any) => { return onDrawerClose(e, true); }}
-            visible={this.state.showTeachDetialDrawer}
+            visible={this.state.showAwardAndOtherDetailDrawer}
             type={this.state.defaultActiveKey}
             yesOrNoOptions={yesOrNoOptions}
             findLabel={findLabel}
@@ -380,4 +303,4 @@ class TeachDrawer extends React.PureComponent<IProps, IState> {
   }
 }
 
-export default TeachDrawer;
+export default AwardAndOtherDrawer;

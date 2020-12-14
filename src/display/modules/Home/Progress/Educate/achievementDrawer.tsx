@@ -103,7 +103,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={drawerData && drawerData.achievement_type && _.find(getOption('achievement_type'), ['value', drawerData.award_type.toString()])?.label}
+                  value={drawerData && drawerData.award_type && _.find(getOption('award_type'), ['value', drawerData.award_type.toString()])?.label}
                 />
               </Col>
             </Row>
@@ -175,7 +175,7 @@ class AchievementDrawer extends React.PureComponent<IProps, IState> {
               </Col>
               <Col span={6}>
                 <DescriptionItem
-                  value={drawerData && drawerData.achievement_type && _.find(getOption('achievement_type'), ['value', drawerData.award_type.toString()])?.label}
+                  value={drawerData && drawerData.achievement_type && _.find(getOption('achievement_type'), ['value', drawerData.achievement_type.toString()])?.label}
                 />
               </Col>
             </Row>
