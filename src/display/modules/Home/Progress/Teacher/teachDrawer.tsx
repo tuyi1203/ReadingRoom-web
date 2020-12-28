@@ -73,7 +73,7 @@ class TeachDrawer extends React.PureComponent<IProps, IState> {
     let params: any = {
       page_size: this.state.pageSize,
       page: this.state.page,
-      type: 'award',
+      type: 'teach',
       category: this.state.defaultActiveKey
     };
 

@@ -357,7 +357,7 @@ class Login extends React.Component<IProps, IState> {
           !showBind &&
           <div className="auth-form">
             <div className="logo" />
-            <div className="text">人民小学系统登录</div>
+            <div className="text">人民小学教师业务档案管理系统</div>
             <div className="form">
               <Form>
                 <FormItem label="用户邮箱">
