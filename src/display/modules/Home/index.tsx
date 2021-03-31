@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Switch, } from 'react-router-dom';
-import { Layout, message } from 'antd';
+import { Layout, message, Form } from 'antd';
 import routes from './router';
 import Header from 'src/display/components/Header';
 import Slider from 'src/display/components/Slider';
@@ -16,6 +16,7 @@ message.config({
 /** Props接口，定义需要用到的Porps类型 */
 export interface IProps {
   history: any;
+  form: any;
 }
 
 /** State接口，定义需要用到的State类型，constructor中的state应该和此定义一致 */
@@ -50,7 +51,12 @@ class Home extends React.Component<IProps, IState> {
     console.log(document.body.clientHeight);
     return (
       <Layout>
-        <Header collapsed={this.state.collapsed} toggle={this.toggle} history={this.props.history} />
+        <Header
+          collapsed={this.state.collapsed}
+          toggle={this.toggle}
+          history={this.props.history}
+          form={this.props.form}
+        />
         <Layout>
           <Sider
             trigger={null}
@@ -74,4 +80,4 @@ class Home extends React.Component<IProps, IState> {
   }
 }
 
-export default Home;
+export default Form.create({})(Home);

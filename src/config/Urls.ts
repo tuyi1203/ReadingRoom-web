@@ -17,6 +17,9 @@ enum Urls {
   getPermissionsByRid = '/permissions/rid/{id}', // 取得角色拥有的所有权限列表
   editPermissionsByRid = '/permissions/rid/{id}', // 修改角色拥有的所有权限
 
+  // -----------用户信息接口------------
+  editUserPassword = '/profile/password', // 更新用户密码
+
   // -----------用户管理接口------------
   getUserList = '/users', // 获取用户列表
   delUser = '/users/{id}', // 删除单个用户

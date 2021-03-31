@@ -1,13 +1,14 @@
 import * as React from 'react';
-import { Layout, Icon, Menu, Dropdown, Avatar, message } from 'antd';
+import { Layout, Icon, Menu, Dropdown, Avatar, message, Modal } from 'antd';
 import { Link, } from 'react-router-dom';
 import IToken from 'src/dataModel/IToken';
 import storageUtils from 'src/utils/storageUtils';
 import Constant from 'src/dataModel/Constant';
 import IPages from 'src/dataModel/IPages';
-import { system } from 'src/api';
+import { system, progress } from 'src/api';
 import MenuMap from '../MenuMap';
 import './index.css';
+import PasswordResetForm from './passwordResetForm';
 
 const { Header } = Layout;
 
@@ -16,6 +17,7 @@ export interface IProps {
   collapsed: boolean;
   toggle: any;
   history?: any;
+  form: any;
 }
 
 /** State接口，定义需要用到的State类型，constructor中的state应该和此定义的类型一致 */
@@ -24,6 +26,7 @@ export interface IState {
   currentPage: IPages;
   shortcutPages: IPages[];
   showMap: boolean;
+  showPasswordPanel: boolean;
 }
 
 /**
@@ -36,7 +39,8 @@ class MyHeader extends React.PureComponent<IProps, IState> {
       token: JSON.parse(storageUtils.get(Constant.LOGIN_KEY)),
       currentPage: JSON.parse(storageUtils.get(Constant.CURRENT_PAGE_KEY)),
       shortcutPages: [],
-      showMap: false
+      showMap: false,
+      showPasswordPanel: false,
     };
   }
 
@@ -78,11 +82,54 @@ class MyHeader extends React.PureComponent<IProps, IState> {
       window.location.href = '/login';
     };
 
+    /**
+     * 取消弹出窗口
+     */
+    const onCancel = () => {
+      this.setState({
+        showPasswordPanel: false,
+      });
+    };
+
+    /**
+     * 保存密码
+     */
+    const onOk = () => {
+      this.props.form.validateFields(/*['loginId'],*/ async (err: boolean, values: any) => {
+        if (!err) {
+          let res: any = null;
+          let params: any = null;
+          params = { ...values };
+
+          res = await progress.resetPassword(params);
+          if (res.code) {
+            message.error(res.msg);
+            return;
+          }
+          message.success('密码修改成功');
+          onCancel();
+        }
+      });
+    };
+
+    /**
+     * 点击修改密码按钮
+     */
+    const onClick = () => {
+      this.setState({
+        showPasswordPanel: true,
+      });
+      console.log(!this.state.showPasswordPanel);
+    };
+
     // 登录信息下拉菜单
     const menu = (
       <Menu>
+        <Menu.Item key="4">
+          <a onClick={() => onClick()}>修改登陆密码</a>
+        </Menu.Item>
         <Menu.Item key="3">
-          <a onClick={() => logOut()}><Icon type="logout" /> 注销</a>
+          <a onClick={() => logOut()}>注销</a>
         </Menu.Item>
       </Menu>
     );
@@ -203,6 +250,19 @@ class MyHeader extends React.PureComponent<IProps, IState> {
         </div>
         {/* 网站地图 */}
         <MenuMap showMap={this.state.showMap} closeMap={closeMap} history={this.props.history} />
+        { this.state.showPasswordPanel &&
+          <Modal
+            title="修改密码"
+            visible={this.state.showPasswordPanel}
+            onOk={onOk}
+            maskClosable={false}
+            onCancel={onCancel}
+            centered={true}
+            destroyOnClose={true}
+            width={600}
+          >
+            <PasswordResetForm form={this.props.form} />
+          </Modal>}
       </Header>
     );
   }

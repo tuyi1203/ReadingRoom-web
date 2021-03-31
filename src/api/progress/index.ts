@@ -47,6 +47,7 @@ import getTeacherPDF from './getTeacherPDF';
 import getTeacherAwardList from './getTeacherAwardList';
 import outputAwardExcel from './outputAwardExcel';
 import getTeacherAwardDetail from './getTeacherAwardDetail';
+import resetPassword from './resetPassword';
 export default {
   getBaseInfoDetail,
   getDictList,
@@ -97,4 +98,5 @@ export default {
   getTeacherAwardList,
   outputAwardExcel,
   getTeacherAwardDetail,
+  resetPassword,
 };
