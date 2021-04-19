@@ -3,4 +3,5 @@
  */
 export default interface IResp {
   data: any;
+  total: number;
 }

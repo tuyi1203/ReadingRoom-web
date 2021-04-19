@@ -15,7 +15,7 @@ import {
   // Tabs, 
   // DatePicker
 } from 'antd';
-import AddEditModal from './addEditForm';
+import CategoryTableModal from './categoryTable';
 
 import CommonButton from 'src/display/components/CommonButton';
 import CurrentPage from 'src/display/components/CurrentPage';
@@ -28,16 +28,18 @@ export interface IProps {
 
 /** State接口，定义需要用到的State类型，constructor中的state应该和此定义的类型一致 */
 export interface IState {
-  dictCategoryId: number;
-  dictCategoryName: string;
+  // dictCategoryId: number;
+  // dictCategoryName: string;
   page: number;
   pageSize: number;
   total: number;
   dictList: any;
-  showAdd: boolean;
+  // showAdd: boolean;
   editData: any;
+  categoryData: any;
   filterItems: string[];
   filterParam: any;
+  showCategoryTable: boolean;
 }
 
 /**
@@ -52,23 +54,26 @@ class Datadict extends React.PureComponent<IProps, IState> {
   constructor(props: any) {
     super(props);
     this.state = {
-      dictCategoryId: -1,
-      dictCategoryName: '',
+      // dictCategoryId: -1,
+      // dictCategoryName: '',
       page: 1,
       pageSize: 10,
       total: 0, // 总条数
       dictList: [], // 数据字典列表
-      showAdd: false, // 是否显示添加
-      editData: null, // 编辑数据
+      // showAdd: false, // 是否显示添加
+      editData: null, // 字典编辑数据
+      categoryData: null, // 字典类别数据
       filterItems: [], // 显示的筛选项
       filterParam: {}, // 筛选对象数据
+      showCategoryTable: false,
     };
   }
 
   UNSAFE_componentWillMount() {
 
     // console.log(this.props, this.dictCategoryName);
-    this.getCategoryId();
+    // this.getCategoryId();
+    this.getList();
 
   }
 
@@ -89,8 +94,8 @@ class Datadict extends React.PureComponent<IProps, IState> {
 
     if (res) {
       this.setState({
-        dictCategoryName: dictCategoryName,
-        dictCategoryId: res.results.data[0].id,
+        // dictCategoryName: dictCategoryName,
+        // dictCategoryId: res.results.data[0].id,
       }, () => {
         this.getList();
       });
@@ -105,19 +110,19 @@ class Datadict extends React.PureComponent<IProps, IState> {
     const param: any = {
       page: this.state.page,
       page_size: this.state.pageSize,
-      category_name: this.state.dictCategoryName,
+      // category_name: this.state.dictCategoryName,
     };
 
-    const res = await progress.getDicts(param);
-    // console.log(res.code);
+    const res = await progress.getDictCategory(param);
+    console.log(res.results.data.data);
     if (res.code) {
       return;
     }
 
     if (res) {
       this.setState({
-        dictList: res.results.data,
-        total: res.results.total
+        dictList: res.results.data.data,
+        total: res.results.data.total
       });
     }
   }
@@ -128,13 +133,13 @@ class Datadict extends React.PureComponent<IProps, IState> {
       page,
       pageSize,
       dictList,
-      dictCategoryName,
+      // dictCategoryName,
     } = this.state;
 
-    if (this.props.location.pathname.substring(this.props.location.pathname.lastIndexOf('/') + 1)
-      !== dictCategoryName) {
-      this.getCategoryId();
-    }
+    // if (this.props.location.pathname.substring(this.props.location.pathname.lastIndexOf('/') + 1)
+    //   !== dictCategoryName) {
+    //   this.getCategoryId();
+    // }
 
     // const { getFieldDecorator } = this.props.form;
 
@@ -155,10 +160,20 @@ class Datadict extends React.PureComponent<IProps, IState> {
     /**
      * 显示编辑
      */
-    const showEdit = (record: any) => {
+    // const showEdit = (record: any) => {
+    //   this.setState({
+    //     editData: record,
+    //     showAdd: true
+    //   });
+    // };
+
+    /**
+     * 显示详情
+     */
+    const showCategoryTable = (record: any) => {
       this.setState({
-        editData: record,
-        showAdd: true
+        categoryData: record,
+        showCategoryTable: true
       });
     };
 
@@ -208,19 +223,13 @@ class Datadict extends React.PureComponent<IProps, IState> {
      */
     let column = [
       {
-        title: '字典标号',
-        key: 'dict_code',
-        dataIndex: 'dict_code',
+        title: '字典标识',
+        key: 'category_name',
+        dataIndex: 'category_name',
         width: 200,
       },
       {
-        title: '数据显示名称',
-        key: 'dict_name',
-        dataIndex: 'dict_name',
-        width: 200,
-      },
-      {
-        title: '数据备注',
+        title: '字典显示名称',
         key: 'remark',
         dataIndex: 'remark',
         width: 200,
@@ -239,7 +248,7 @@ class Datadict extends React.PureComponent<IProps, IState> {
         render: (text: any, record: any) => {
           return (
             <div>
-              <Button type="primary" onClick={() => showEdit(record)}>编辑</Button>
+              <Button type="primary" onClick={() => showCategoryTable(record)}>详情</Button>
               <Divider type="vertical" />
               <Popconfirm title="确认删除吗?" onConfirm={() => del(record)}>
                 <Button type="danger">删除</Button>
@@ -250,52 +259,13 @@ class Datadict extends React.PureComponent<IProps, IState> {
       },
     ];
 
-    /*
-    * 显示添加
-    */
-    const showAdd = () => {
-      this.setState({
-        showAdd: true
-      });
-    };
-
     /**
-     * 模态窗取消
+     * 数据字典分类模态窗取消
      */
-    const onCancel = () => {
+    const onCategoryTableCancel = () => {
       this.setState({
-        showAdd: false,
-        editData: null
-      });
-      // 删除临时上传的文件
-    };
-
-    /**
-     * 模态窗保存
-     */
-    const onOk = () => {
-      this.props.form.validateFields(/*['loginId'],*/ async (err: boolean, values: any) => {
-        if (!err) {
-          let res: any = null;
-          let params: any = null;
-          params = { ...values };
-
-          if (this.state.editData) {
-
-            res = await progress.editDictData(params, this.state.editData.id);
-          } else {
-            // 新增
-            params.dict_category = this.state.dictCategoryId;
-            res = await progress.addDictData(params);
-          }
-          if (res.code) {
-            message.error(res.msg);
-            return;
-          }
-          message.success('数据保存成功');
-          onCancel();
-          this.getList();
-        }
+        showCategoryTable: false,
+        categoryData: null
       });
     };
 
@@ -320,7 +290,7 @@ class Datadict extends React.PureComponent<IProps, IState> {
           <div className="page-button">
             <CommonButton />
             {/* 下面写本页面需要的按钮 */}
-            <Button type="primary" icon="plus" onClick={() => { showAdd(); }}>新增</Button>
+            {/* <Button type="primary" icon="plus" onClick={() => { showAdd(); }}>新增</Button> */}
             {/* 下面本页的筛选项 */}
           </div>
         </div>
@@ -516,21 +486,25 @@ class Datadict extends React.PureComponent<IProps, IState> {
             />
           </div>
         </div>
+
         {
-          this.state.showAdd &&
+          this.state.showCategoryTable &&
           <Modal
-            title={this.state.editData ? '修改' : '新增'}
-            visible={this.state.showAdd}
-            onOk={onOk}
+            title="数据字典列表"
+            visible={this.state.showCategoryTable}
+            cancelText="关闭"
+            footer={null}
+            // onOk={onOk}
+            keyboard={true}
             maskClosable={false}
-            onCancel={onCancel}
+            onCancel={onCategoryTableCancel}
             centered={true}
             destroyOnClose={true}
-            width={800}
+            width={1200}
           >
-            {<AddEditModal
+            {<CategoryTableModal
               form={this.props.form}
-              editData={this.state.editData}
+              categoryData={this.state.categoryData}
             />}
           </Modal>
         }
