@@ -10,7 +10,7 @@ const config = {
   /**
    * api域名
    */
-  apiDomain: 'http://API_GATEWAY_HOST'
+  apiDomain: 'http://222.178.117.106:84/api/v1'
 }
 
 module.exports = config;

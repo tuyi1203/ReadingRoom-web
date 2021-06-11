@@ -80,7 +80,9 @@ enum Urls {
 
   // -----------学生档案接口------------
   outputStudentSpecialityInfoExcel = '/students/speciality/info_search_excel', // 输出学生特长列表数据为excel
+  outputStudentSpecialityAwardExcel = '/students/speciality/award_search_excel', // 输出学生获奖列表数据为excel
   getStudentSpecialityInfoList = '/students/speciality/info_search', // 获取学生特长列表数据
+  getStudentSpecialityAwardList = '/students/speciality/award_search', // 获取学生特长列表数据
   getStudentSpecialityTypeList = '/students/speciality/get_speciality_types', // 获取学生特长类型
   getStudentSpecialityInfoNameList = '/students/speciality/get_info_names', // 获取学生特长名称列表
   getCampusClasses = '/students/speciality/get_campus_classes', // 获取学校班级级联数据
