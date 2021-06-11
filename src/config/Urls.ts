@@ -78,6 +78,14 @@ enum Urls {
   getTeacherAwardList = '/progress/award/search', // 获取教师成果获奖列表数据
   outputTeacherAwardExcel = '/progress/award/search/excel', // 输出教师成果获奖列表数据为excel
 
+  // -----------学生档案接口------------
+  outputStudentSpecialityInfoExcel = '/students/speciality/info_search_excel', // 输出学生特长列表数据为excel
+  getStudentSpecialityInfoList = '/students/speciality/info_search', // 获取学生特长列表数据
+  getStudentSpecialityTypeList = '/students/speciality/get_speciality_types', // 获取学生特长类型
+  getStudentSpecialityInfoNameList = '/students/speciality/get_info_names', // 获取学生特长名称列表
+  getCampusClasses = '/students/speciality/get_campus_classes', // 获取学校班级级联数据
+
+  // -----------文件操作接口------------
   addFile = '/files/', // 上传文件
   delFile = '/files/{id}/', // 删除文件
   getFileList = '/files/', // 获取文件列表

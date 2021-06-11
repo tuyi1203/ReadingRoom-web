@@ -16,4 +16,5 @@ export { default as contractmanager } from './contractmanager';
 export { default as attaches } from './attaches';
 export { default as wechat } from './wechat';
 export { default as progress } from './progress';
+export { default as students } from './students';
 export { default as files } from './files';

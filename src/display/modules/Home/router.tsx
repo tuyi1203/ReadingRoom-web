@@ -9,10 +9,12 @@ import Orchestration from './Orchestration';
 import IPManager from './IPManager';
 import ISPManager from './ISPManager';
 import Progress from './Progress';
+import Students from './Students';
 
 const routers = [
   <Route key="/usermanager" path="*/usermanager" component={UserManager} />, // 用户及权限管理
-  <Route key="/progress" path="*/progress" component={Progress} />, // 教师发展辅助系统管理
+  <Route key="/progress" path="*/progress" component={Progress} />, // 教师发展辅助子系统
+  <Route key="/students" path="*/students" component={Students} />, // 学生档案子系统
   <Route key="/dashboard" path="*/dashboard" component={Dashboard} />,
   <Route exact={true} key="/infra/datadict" path="*/infra/datadict" component={Datadict} />, // 网元字典
   <Route key="/infra/datacenter" path="*/infra/datacenter" component={Datacenter} />, // 数据中心字典
