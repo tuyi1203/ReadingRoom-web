@@ -156,7 +156,7 @@ class SpecialityInfoSearch extends React.PureComponent<IProps, IState> {
     // 增加筛选条件
     if (this.state.filterParam) {
       if (this.state.filterParam.filter_campus) {
-        param.campus = this.state.filterParam.filter_campus;
+        param.campus = this.state.filterParam.campus;
       }
       if (this.state.filterParam.filter_class) {
         param.class_id = this.state.filterParam.filter_class[2];
@@ -172,9 +172,6 @@ class SpecialityInfoSearch extends React.PureComponent<IProps, IState> {
       }
       if (this.state.filterParam.filter_speciality_level) {
         param.speciality_level = this.state.filterParam.filter_speciality_level;
-      }
-      if (this.state.filterParam.filter_name) {
-        param.student_name = this.state.filterParam.filter_name;
       }
     }
     return param;
