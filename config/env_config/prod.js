@@ -10,7 +10,7 @@ const config = {
   /**
    * api域名
    */
-  apiDomain: 'http://222.178.117.106:84/api/v1'
+  apiDomain: 'http://219.151.134.108:8081//api/v1'
 }
 
 module.exports = config;
