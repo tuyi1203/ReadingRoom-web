@@ -154,7 +154,7 @@ class SpecialityInfoSearch extends React.PureComponent<IProps, IState> {
     };
 
     // 增加筛选条件
-    if (this.state.filterParam) {
+    if (this.state.filterParam.filter_campus) {
       if (this.state.filterParam.filter_campus) {
         param.campus = this.state.filterParam.campus;
       }
