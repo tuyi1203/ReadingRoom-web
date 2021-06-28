@@ -438,7 +438,8 @@ class SpecialityInfoSearch extends React.PureComponent<IProps, IState> {
       ], async (err: boolean, values: any) => {
         if (!err) {
           this.setState({
-            filterParam: values
+            filterParam: values,
+            page: 1,
           }, () => {
             this.getList();
           });
