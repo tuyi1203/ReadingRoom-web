@@ -18,3 +18,5 @@ export { default as wechat } from './wechat';
 export { default as progress } from './progress';
 export { default as students } from './students';
 export { default as files } from './files';
+export { default as notifications } from './notifications';
+export { default as classtable } from './classtable';

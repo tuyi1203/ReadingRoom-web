@@ -1,0 +1,42 @@
+
+    .events {
+        list-style-type: none !important;
+        list-style: none !important;
+        margin: 0;
+        padding: 0;
+    }
+    .events li{
+        list-style-type: none !important;
+        margin: 0 !important;
+    }
+    .events .ant-badge-status {
+        overflow: hidden;
+        white-space: nowrap;
+        width: 100%;
+        text-overflow: ellipsis;
+        font-size: 12px;
+    }
+    
+    .notes-month {
+        text-align: center;
+        font-size: 28px;
+    }
+    
+    .notes-month section {
+        font-size: 28px;
+    }
+    .title{
+        color: #5363a6 !important;
+        font-size: 18px !important;
+        font-weight: bold !important;
+    }
+    .eventsli span:hover{
+        color: #1809ef !important;
+        
+    }
+    .eventsli{
+        display: flex;
+    }
+    .deleteicon:hover{
+        color: #ff4d4f !important;
+    }

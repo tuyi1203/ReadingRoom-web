@@ -10,18 +10,20 @@ import IPManager from './IPManager';
 import ISPManager from './ISPManager';
 import Progress from './Progress';
 import Students from './Students';
+import Tools from './CommonlyTools';
 
 const routers = [
-  <Route key="/usermanager" path="*/usermanager" component={UserManager} />, // 用户及权限管理
-  <Route key="/progress" path="*/progress" component={Progress} />, // 教师发展辅助子系统
-  <Route key="/students" path="*/students" component={Students} />, // 学生档案子系统
-  <Route key="/dashboard" path="*/dashboard" component={Dashboard} />,
-  <Route exact={true} key="/infra/datadict" path="*/infra/datadict" component={Datadict} />, // 网元字典
-  <Route key="/infra/datacenter" path="*/infra/datacenter" component={Datacenter} />, // 数据中心字典
-  <Route key="/orchestration" path="*/orchestration" component={Orchestration} />, // 编排器管理
-  <Route key="/infra/netelementmanager" path="*/infra/netelementmanager" component={NetElementManager} />, // 网元管理
-  <Route key="/ispmanager" path="*/ispmanager/" component={ISPManager} />, // 运营商管理
-  <Route key="/ipmanager" path="*/ipmanager/" component={IPManager} />, // IP资源管理
+    <Route key="/usermanager" path="*/usermanager" component={UserManager} />, // 用户及权限管理
+    <Route key="/progress" path="*/progress" component={Progress} />, // 教师发展辅助子系统
+    <Route key="/students" path="*/students" component={Students} />, // 学生档案子系统
+    <Route key="/tools" path="*/tools" component={Tools} />, // 常用功能
+    <Route key="/dashboard" path="*/dashboard" component={Dashboard} />,
+    <Route exact={true} key="/infra/datadict" path="*/infra/datadict" component={Datadict} />, // 网元字典
+    <Route key="/infra/datacenter" path="*/infra/datacenter" component={Datacenter} />, // 数据中心字典
+    <Route key="/orchestration" path="*/orchestration" component={Orchestration} />, // 编排器管理
+    <Route key="/infra/netelementmanager" path="*/infra/netelementmanager" component={NetElementManager} />, // 网元管理
+    <Route key="/ispmanager" path="*/ispmanager/" component={ISPManager} />, // 运营商管理
+    <Route key="/ipmanager" path="*/ipmanager/" component={IPManager} />, // IP资源管理
 ];
 
 export default routers;

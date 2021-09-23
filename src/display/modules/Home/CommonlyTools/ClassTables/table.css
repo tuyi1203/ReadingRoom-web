@@ -1,0 +1,55 @@
+.table{
+    display: table;
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+.tr_1{
+    display: table-row;
+    height: 50px;
+    color: rgba(0,0,0,.85);
+    font-weight: 500;
+    text-align: left;
+    transition: background .3s ease;
+    background: #fafafa;
+}
+.th_1{
+    display: table-cell;
+    border: 1px solid #e8e8e8;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 16px;
+    font-family: PingFangSC-Semibold, PingFang SC;
+    font-weight: 500;
+    color: #2B3530;
+}
+.tr_2 {
+    display: table-row;
+    height: 40px;
+}
+.td {
+    display: table-cell;
+    border: 1px solid #e8e8e8;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 14px;
+    font-family: PingFangSC-Regular, PingFang SC;
+    font-weight: 400;
+    color: #2B3530;
+  }
+.myclassbox{
+    display: flex;
+    justify-content: center;
+}
+.myclass{
+    display: block;
+     width: 20px;
+    height: 20px;
+    font-size: 12px;
+    font-family: PingFangSC-Regular, PingFang SC;
+    font-weight: 400;
+    color: #365ddb;
+    border: 1px solid #365ddb;
+    border-radius: 50%;
+    margin-left: 10px;
+}
